@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TSAR Task Tracker</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      padding: 2rem;
+      color: #333;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 2rem;
+      color: #1a1a1a;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 2rem;
+    }
+
+    .tab-btn {
+      padding: 1rem 1.5rem;
+      border: none;
+      background: none;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      color: #999;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      color: #1a1a1a;
+      border-bottom-color: #1a1a1a;
+    }
+
+    .view-indicator {
+      font-size: 12px;
+      color: #666;
+      background: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+
+    .add-form {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      border: 1px solid #ddd;
+    }
+
+    .add-form h2 {
+      font-size: 16px;
+      margin-bottom: 1rem;
+      color: #1a1a1a;
+    }
+
+    .form-group {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    input[type="text"],
+    textarea {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #1a1a1a;
+      box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      border: 1px solid #ddd;
+      background: #fff;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      border-color: #1a1a1a;
+      background: #f5f5f5;
+    }
+
+    .task-list {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .task-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .task-number {
+      font-weight: 600;
+      color: #999;
+      min-width: 40px;
+    }
+
+    .task-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .task-text {
+      font-size: 16px;
+      color: #1a1a1a;
+      margin-bottom: 0.5rem;
+      word-break: break-word;
+    }
+
+    .task-text.completed {
+      text-decoration: line-through;
+      color: #999;
+    }
+
+    .task-date {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .complete-btn {
+      background: #d4edda;
+      color: #155724;
+      border-color: #c3e6cb;
+      font-weight: 600;
+      padding: 0.5rem 0.75rem;
+      font-size: 12px;
+    }
+
+    .complete-btn:hover {
+      background: #c3e6cb;
+    }
+
+    .notes-btn {
+      padding: 0.5rem 0.75rem;
+      font-size: 12px;
+    }
+
+    .task-notes {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+      margin-left: 40px;
+    }
+
+    .notes-display {
+      font-size: 14px;
+      color: #666;
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+
+    .notes-editor {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .notes-editor textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #d4edda;
+      color: #155724;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-number {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>TSAR Task Tracker</h1>
+      <div class="view-indicator" id="viewIndicator">Master List</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('master')">Master List</button>
+      <button class="tab-btn" onclick="switchTab('todo')">Do List</button>
+    </div>
+
+    <div class="add-form">
+      <h2>Add a new task</h2>
+      <div class="form-group">
+        <input type="text" id="newTask" placeholder="Task name..." />
+        <button onclick="addTask()">+ Add Task</button>
+      </div>
+    </div>
+
+    <div id="masterTab">
+      <div class="task-list" id="masterList"></div>
+    </div>
+
+    <div id="todoTab" class="hidden">
+      <div class="task-list" id="todoList"></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Total</div>
+        <div class="stat-number" id="totalCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Completed</div>
+        <div class="stat-number" id="completeCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Remaining</div>
+        <div class="stat-number" id="remainingCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">% Done</div>
+        <div class="stat-number" id="percentCount">0%</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let tasks = [];
+    let currentTab = 'master';
+    let expandedNotes = {};
+
+    const initialTasks = [
+      "PHMSA OSRP Plan – LOC",
+      "Check SDS sheets at each location",
+      "Ensure chemical awareness from team ops",
+      "SOPs reviewed",
+      "MOC for TSAR Block Valves",
+      "MOC for chemical change",
+      "MOC for FCT water drop coupon",
+      "MOC for LACT 5 PCV (back pressure valve)",
+      "Lessons learned from audit – revisions/forms",
+      "Updated forms for line crossing",
+      "Order peroxide for test",
+      "Send Ryan SPCC findings for Casey corrections",
+      "SPCC FCT tanks – questions with attorneys",
+      "LONO Request – reply pending",
+      "Schedule SPL Testing",
+      "Update for IMP plan",
+      "Update for foreign line crossing/exposed pipeline report",
+      "VFD PM at Elm",
+      "Check all ESD shutdowns at Elm",
+      "Setpoint PSVs at Elmendorf",
+      "LACT 5 back pressure valve",
+      "Rebuild MOV 71 actuator",
+      "Fireproofing at Elmendorf",
+      "Paint pipeline valves",
+      "FCT boosters / strainers PM",
+      "Transfer pump installation (Elmendorf)",
+      "Tank 102 cleanout plan",
+      "Filter pod baskets remake (Angus)",
+      "Filter screens – TSAR pipeline entry strainer",
+      "FCT pad repair",
+      "Block Valve #4 actuator mounting",
+      "Schedule PSV swap-outs",
+      "Schedule valve inspections",
+      "Order proving valve – TSAR incoming skid",
+      "Source correct replacement valve (David WO)",
+      "Issue PO – MIS pig run XYZ (TSAR jumper)",
+      "PO for transfer pump (United)",
+      "Paradigm Req 3452",
+      "Block Valve #4 painting",
+      "Block Valve #3 painting",
+      "Train pig (Kevin Wheeler)",
+      "Check sample pot lineup – Elm",
+      "Water drop inspection – TSAR entry skid",
+      "Tank inspections – Pinnacle",
+      "Piping inspection – Elm & FCT",
+      "Coupon report",
+      "Tank inspection review with David",
+      "SPL Testing execution",
+      "FT1 Meter Proving (Calibration)",
+      "Annual pressure transmitter testing",
+      "Truck inspections (daily)",
+      "4603 water draw",
+      "Monthly fire extinguisher inspections (FCT & Elm)",
+      "Investigate LEL alarms – FCT (P1002)",
+      "Update KNPS overview (alarm responsibilities)",
+      "Upload DuPont schedule and align coverage",
+      "Confirm ACS PM completed – Elmendorf",
+      "Air vent cleaning quotes",
+      "Follow up MIS – commodity release alarm",
+      "Firewall/comms update request (MIS)",
+      "MOC – add LEL tags to SCADA",
+      "Backup internet (Jacob)",
+      "GIS mapping (Meghan – Cumberland)",
+      "Enable TMS6 login all locations",
+      "Upload IMP to SharePoint",
+      "Meter proving sheets saved",
+      "Legacy Rockwell software",
+      "Cayman Cargo MSA",
+      "Adam Grier MSA",
+      "Wade & Vic connection agreement",
+      "Watch Aerial coordination",
+      "Rosen report",
+      "Refined Land Services invoice",
+      "FCT SDV / PSV study meeting",
+      "Transfer pump setup (engineering)"
+    ];
+
+    function init() {
+      const saved = localStorage.getItem('tsar-tasks');
+      if (saved) {
+        tasks = JSON.parse(saved);
+      } else {
+        tasks = initialTasks.map((text, i) => ({
+          id: i + 1,
+          number: i + 1,
+          text: text,
+          completed: false,
+          notes: ""
+        }));
+        save();
+      }
+      render();
+    }
+
+    function save() {
+      localStorage.setItem('tsar-tasks', JSON.stringify(tasks));
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', (i === 0 && tab === 'master') || (i === 1 && tab === 'todo'));
+      });
+      document.getElementById('masterTab').classList.toggle('hidden', tab !== 'master');
+      document.getElementById('todoTab').classList.toggle('hidden', tab !== 'todo');
+      document.getElementById('viewIndicator').textContent = tab === 'master' ? 'Master List' : 'Do List';
+      render();
+    }
+
+    function addTask() {
+      const input = document.getElementById('newTask');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const newNumber = Math.max(...tasks.map(t => t.number), 0) + 1;
+      tasks.push({
+        id: Date.now(),
+        number: newNumber,
+        text: text,
+        completed: false,
+        notes: ""
+      });
+
+      input.value = '';
+      save();
+      render();
+    }
+
+    function completeTask(id) {
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        task.completed = !task.completed;
+        save();
+        render();
+      }
+    }
+
+    function toggleNotes(id) {
+      expandedNotes[id] = !expandedNotes[id];
+      render();
+    }
+
+    function updateNotes(id, text) {
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        task.notes = text;
+        save();
+      }
+    }
+
+    function render() {
+      let filtered = tasks;
+      if (currentTab === 'todo') {
+        filtered = tasks.filter(t => !t.completed);
+      }
+
+      const html = filtered.length === 0 
+        ? '<div class="empty-state">No tasks</div>'
+        : filtered.map(task => `
+            <div class="task-card">
+              <div class="task-header">
+                <div style="flex: 1;">
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="task-number">#${task.number}</span>
+                    <div class="task-content">
+                      <div class="task-text ${task.completed ? 'completed' : ''}">${escapeHtml(task.text)}${task.completed ? '<span class="badge">completed</span>' : ''}</div>
+                      <div class="task-date">${new Date().toISOString().split('T')[0]}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="task-actions">
+                  <button class="complete-btn" onclick="completeTask(${task.id})">✓</button>
+                  <button class="notes-btn" onclick="toggleNotes(${task.id})">Notes</button>
+                </div>
+              </div>
+              ${task.notes ? `<div class="notes-display">📝 ${escapeHtml(task.notes)}</div>` : ''}
+              ${expandedNotes[task.id] ? `
+                <div class="task-notes">
+                  <div class="notes-editor">
+                    <textarea onchange="updateNotes(${task.id}, this.value)" placeholder="Add notes here...">${escapeHtml(task.notes)}</textarea>
+                    <small>Saves when you unfocus</small>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          `).join('');
+
+      const targetList = currentTab === 'master' ? 'masterList' : 'todoList';
+      document.getElementById(targetList).innerHTML = html;
+
+      const total = tasks.length;
+      const complete = tasks.filter(t => t.completed).length;
+      const remaining = total - complete;
+      const percent = total > 0 ? Math.round((complete / total) * 100) : 0;
+
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('completeCount').textContent = complete;
+      document.getElementById('remainingCount').textContent = remaining;
+      document.getElementById('percentCount').textContent = percent + '%';
+    }
+
+    function escapeHtml(text) {
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    document.getElementById('newTask').addEventListener('keypress', e => {
+      if (e.key === 'Enter') addTask();
+    });
+
+    init();
+  </script>
+</body>
+</html>
