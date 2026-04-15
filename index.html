@@ -5,312 +5,117 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TSAR Task Tracker</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 1rem; color: #333; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 24px; margin-bottom: 1rem; color: #1a1a1a; text-align: center; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f5f5;
-      padding: 2rem;
-      color: #333;
-    }
+    .tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; }
+    .tab-btn { flex: 1; padding: 1rem; border: none; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.2s; color: #fff; }
+    .tab-btn[data-tab="master"] { background: #1a5276; }
+    .tab-btn[data-tab="todo"] { background: #d4ac0d; color: #333; }
+    .tab-btn[data-tab="followup"] { background: #c0392b; }
+    .tab-btn.active { outline: 3px solid #333; outline-offset: -3px; }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
+    .view-banner { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; font-weight: 600; font-size: 16px; color: #fff; }
+    .view-banner.master { background: #1a5276; }
+    .view-banner.todo { background: #d4ac0d; color: #333; }
+    .view-banner.followup { background: #c0392b; }
 
-    h1 {
-      font-size: 28px;
-      margin-bottom: 2rem;
-      color: #1a1a1a;
-    }
+    .add-form { background: #fff; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid #ddd; }
+    .add-form h2 { font-size: 16px; margin-bottom: 0.75rem; }
+    .form-row { display: flex; gap: 8px; }
+    .form-row input { flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    .form-row input:focus { outline: none; border-color: #1a5276; }
+    .form-row button { padding: 0.75rem 1.25rem; border: none; background: #1a5276; color: #fff; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
+    .task-list { display: grid; gap: 0.75rem; margin-bottom: 1.5rem; }
 
-    .tabs {
-      display: flex;
-      gap: 1rem;
-      border-bottom: 1px solid #ddd;
-      margin-bottom: 2rem;
-    }
+    .task-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; }
+    .task-card.is-complete { border-left: 4px solid #27ae60; }
+    .task-card.is-followup { border-left: 4px solid #c0392b; }
+    .task-card.is-complete.is-followup { border-left: 4px solid #e67e22; }
 
-    .tab-btn {
-      padding: 1rem 1.5rem;
-      border: none;
-      background: none;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      color: #999;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s;
-    }
+    .task-top { display: flex; align-items: flex-start; gap: 10px; }
+    .task-number { font-weight: 700; color: #999; min-width: 36px; font-size: 14px; padding-top: 2px; }
+    .task-content { flex: 1; min-width: 0; }
+    .task-text { font-size: 15px; color: #1a1a1a; word-break: break-word; margin-bottom: 4px; }
+    .task-text.done { text-decoration: line-through; color: #999; }
 
-    .tab-btn.active {
-      color: #1a1a1a;
-      border-bottom-color: #1a1a1a;
-    }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 6px; vertical-align: middle; }
+    .badge-complete { background: #d5f5e3; color: #1e8449; }
+    .badge-followup { background: #fadbd8; color: #922b21; }
+    .badge-partial { background: #fdebd0; color: #b9770e; }
 
-    .view-indicator {
-      font-size: 12px;
-      color: #666;
-      background: #fff;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-    }
+    .task-actions { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
+    .btn-complete { padding: 6px 10px; border-radius: 6px; border: 1px solid #27ae60; background: #d5f5e3; color: #1e8449; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .btn-followup { padding: 6px 10px; border-radius: 6px; border: 1px solid #c0392b; background: #fadbd8; color: #922b21; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .btn-notes { padding: 6px 10px; border-radius: 6px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .btn-complete:hover, .btn-followup:hover, .btn-notes:hover { opacity: 0.8; }
 
-    .add-form {
-      background: #fff;
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin-bottom: 2rem;
-      border: 1px solid #ddd;
-    }
+    .task-notes-display { margin-top: 8px; padding: 8px 10px; background: #f9f9f9; border-radius: 6px; font-size: 13px; color: #555; white-space: pre-wrap; word-break: break-word; }
+    .note-entry { border-bottom: 1px solid #eee; padding: 4px 0; }
+    .note-entry:last-child { border-bottom: none; }
+    .note-date { font-size: 11px; color: #999; }
 
-    .add-form h2 {
-      font-size: 16px;
-      margin-bottom: 1rem;
-      color: #1a1a1a;
-    }
+    .notes-editor { margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+    .notes-editor textarea { width: 100%; min-height: 70px; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical; }
+    .notes-editor textarea:focus { outline: none; border-color: #1a5276; }
+    .notes-editor button { margin-top: 8px; padding: 8px 16px; border: none; background: #1a5276; color: #fff; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
 
-    .form-group {
-      display: grid;
-      gap: 0.5rem;
-    }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1rem; }
+    .stat-card { background: #fff; padding: 1rem; border-radius: 8px; border: 1px solid #ddd; text-align: center; }
+    .stat-label { font-size: 11px; color: #999; margin-bottom: 4px; }
+    .stat-number { font-size: 22px; font-weight: 700; }
+    .stat-number.total { color: #1a5276; }
+    .stat-number.complete { color: #27ae60; }
+    .stat-number.remaining { color: #d4ac0d; }
+    .stat-number.followup { color: #c0392b; }
 
-    input[type="text"],
-    textarea {
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    input[type="text"]:focus,
-    textarea:focus {
-      outline: none;
-      border-color: #1a1a1a;
-      box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
-    }
-
-    button {
-      padding: 0.75rem 1.5rem;
-      border: 1px solid #ddd;
-      background: #fff;
-      border-radius: 4px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    button:hover {
-      border-color: #1a1a1a;
-      background: #f5f5f5;
-    }
-
-    .task-list {
-      display: grid;
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .task-card {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 1.5rem;
-    }
-
-    .task-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .task-number {
-      font-weight: 600;
-      color: #999;
-      min-width: 40px;
-    }
-
-    .task-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .task-text {
-      font-size: 16px;
-      color: #1a1a1a;
-      margin-bottom: 0.5rem;
-      word-break: break-word;
-    }
-
-    .task-text.completed {
-      text-decoration: line-through;
-      color: #999;
-    }
-
-    .task-date {
-      font-size: 12px;
-      color: #999;
-    }
-
-    .task-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .complete-btn {
-      background: #d4edda;
-      color: #155724;
-      border-color: #c3e6cb;
-      font-weight: 600;
-      padding: 0.5rem 0.75rem;
-      font-size: 12px;
-    }
-
-    .complete-btn:hover {
-      background: #c3e6cb;
-    }
-
-    .notes-btn {
-      padding: 0.5rem 0.75rem;
-      font-size: 12px;
-    }
-
-    .task-notes {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid #eee;
-      margin-left: 40px;
-    }
-
-    .notes-display {
-      font-size: 14px;
-      color: #666;
-      font-style: italic;
-      margin-bottom: 1rem;
-    }
-
-    .notes-editor {
-      display: grid;
-      gap: 0.5rem;
-    }
-
-    .notes-editor textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .badge {
-      display: inline-block;
-      background: #d4edda;
-      color: #155724;
-      padding: 0.25rem 0.75rem;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      margin-left: 0.5rem;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .stat-card {
-      background: #fff;
-      padding: 1.5rem;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      text-align: center;
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: #999;
-      margin-bottom: 0.5rem;
-    }
-
-    .stat-number {
-      font-size: 28px;
-      font-weight: 600;
-      color: #1a1a1a;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: #999;
-    }
+    .empty-state { text-align: center; padding: 2rem; color: #999; font-size: 14px; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h1>TSAR Task Tracker</h1>
-      <div class="view-indicator" id="viewIndicator">Master List</div>
-    </div>
+    <h1>TSAR Task Tracker</h1>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('master')">Master List</button>
-      <button class="tab-btn" onclick="switchTab('todo')">Do List</button>
+      <button class="tab-btn active" data-tab="master" onclick="switchTab('master')">Master</button>
+      <button class="tab-btn" data-tab="todo" onclick="switchTab('todo')">Do List</button>
+      <button class="tab-btn" data-tab="followup" onclick="switchTab('followup')">Follow-Up</button>
     </div>
 
-    <div class="add-form">
-      <h2>Add a new task</h2>
-      <div class="form-group">
-        <input type="text" id="newTask" placeholder="Task name..." />
-        <button onclick="addTask()">+ Add Task</button>
-      </div>
-    </div>
-
-    <div id="masterTab">
-      <div class="task-list" id="masterList"></div>
-    </div>
-
-    <div id="todoTab" class="hidden">
-      <div class="task-list" id="todoList"></div>
-    </div>
+    <div class="view-banner master" id="viewBanner">Master List</div>
 
     <div class="stats">
       <div class="stat-card">
         <div class="stat-label">Total</div>
-        <div class="stat-number" id="totalCount">0</div>
+        <div class="stat-number total" id="totalCount">0</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Completed</div>
-        <div class="stat-number" id="completeCount">0</div>
+        <div class="stat-label">Complete</div>
+        <div class="stat-number complete" id="completeCount">0</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Remaining</div>
-        <div class="stat-number" id="remainingCount">0</div>
+        <div class="stat-label">To Do</div>
+        <div class="stat-number remaining" id="remainingCount">0</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">% Done</div>
-        <div class="stat-number" id="percentCount">0%</div>
+        <div class="stat-label">Follow-Up</div>
+        <div class="stat-number followup" id="followupCount">0</div>
       </div>
     </div>
+
+    <div class="add-form">
+      <h2>Add a new task</h2>
+      <div class="form-row">
+        <input type="text" id="newTask" placeholder="Task name..." />
+        <button onclick="addTask()">+ Add</button>
+      </div>
+    </div>
+
+    <div class="task-list" id="taskList"></div>
   </div>
 
   <script>
@@ -397,7 +202,7 @@
     ];
 
     function init() {
-      const saved = localStorage.getItem('tsar-tasks');
+      const saved = localStorage.getItem('tsar-tasks-v4');
       if (saved) {
         tasks = JSON.parse(saved);
       } else {
@@ -406,7 +211,9 @@
           number: i + 1,
           text: text,
           completed: false,
-          notes: ""
+          followup: false,
+          notes: [],
+          dateAdded: new Date().toISOString().split('T')[0]
         }));
         save();
       }
@@ -414,17 +221,19 @@
     }
 
     function save() {
-      localStorage.setItem('tsar-tasks', JSON.stringify(tasks));
+      localStorage.setItem('tsar-tasks-v4', JSON.stringify(tasks));
     }
 
     function switchTab(tab) {
       currentTab = tab;
-      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-        btn.classList.toggle('active', (i === 0 && tab === 'master') || (i === 1 && tab === 'todo'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
       });
-      document.getElementById('masterTab').classList.toggle('hidden', tab !== 'master');
-      document.getElementById('todoTab').classList.toggle('hidden', tab !== 'todo');
-      document.getElementById('viewIndicator').textContent = tab === 'master' ? 'Master List' : 'Do List';
+      const banner = document.getElementById('viewBanner');
+      banner.className = 'view-banner ' + tab;
+      if (tab === 'master') banner.textContent = 'Master List';
+      else if (tab === 'todo') banner.textContent = 'Do List';
+      else banner.textContent = 'Follow-Up List';
       render();
     }
 
@@ -432,16 +241,16 @@
       const input = document.getElementById('newTask');
       const text = input.value.trim();
       if (!text) return;
-
       const newNumber = Math.max(...tasks.map(t => t.number), 0) + 1;
       tasks.push({
         id: Date.now(),
         number: newNumber,
         text: text,
         completed: false,
-        notes: ""
+        followup: false,
+        notes: [],
+        dateAdded: new Date().toISOString().split('T')[0]
       });
-
       input.value = '';
       save();
       render();
@@ -456,73 +265,114 @@
       }
     }
 
-    function toggleNotes(id) {
+    function toggleFollowup(id) {
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        task.followup = !task.followup;
+        save();
+        render();
+      }
+    }
+
+    function toggleNotesEditor(id) {
       expandedNotes[id] = !expandedNotes[id];
       render();
     }
 
-    function updateNotes(id, text) {
+    function addNote(id) {
+      const textarea = document.getElementById('note-input-' + id);
+      const text = textarea.value.trim();
+      if (!text) return;
       const task = tasks.find(t => t.id === id);
       if (task) {
-        task.notes = text;
+        if (!Array.isArray(task.notes)) task.notes = [];
+        task.notes.push({
+          text: text,
+          date: new Date().toISOString().split('T')[0]
+        });
+        textarea.value = '';
         save();
+        render();
       }
+    }
+
+    function getStatusBadges(task) {
+      let badges = '';
+      if (task.completed && task.followup) {
+        badges += '<span class="badge badge-partial">completed + follow-up</span>';
+      } else if (task.completed) {
+        badges += '<span class="badge badge-complete">completed</span>';
+      }
+      if (task.followup && !task.completed) {
+        badges += '<span class="badge badge-followup">follow-up needed</span>';
+      }
+      return badges;
+    }
+
+    function escapeHtml(text) {
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return text.replace(/[&<>"']/g, m => map[m]);
     }
 
     function render() {
       let filtered = tasks;
       if (currentTab === 'todo') {
         filtered = tasks.filter(t => !t.completed);
+      } else if (currentTab === 'followup') {
+        filtered = tasks.filter(t => t.followup);
       }
 
-      const html = filtered.length === 0 
-        ? '<div class="empty-state">No tasks</div>'
-        : filtered.map(task => `
-            <div class="task-card">
-              <div class="task-header">
-                <div style="flex: 1;">
-                  <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <span class="task-number">#${task.number}</span>
-                    <div class="task-content">
-                      <div class="task-text ${task.completed ? 'completed' : ''}">${escapeHtml(task.text)}${task.completed ? '<span class="badge">completed</span>' : ''}</div>
-                      <div class="task-date">${new Date().toISOString().split('T')[0]}</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="task-actions">
-                  <button class="complete-btn" onclick="completeTask(${task.id})">✓</button>
-                  <button class="notes-btn" onclick="toggleNotes(${task.id})">Notes</button>
-                </div>
-              </div>
-              ${task.notes ? `<div class="notes-display">📝 ${escapeHtml(task.notes)}</div>` : ''}
-              ${expandedNotes[task.id] ? `
-                <div class="task-notes">
-                  <div class="notes-editor">
-                    <textarea onchange="updateNotes(${task.id}, this.value)" placeholder="Add notes here...">${escapeHtml(task.notes)}</textarea>
-                    <small>Saves when you unfocus</small>
-                  </div>
-                </div>
-              ` : ''}
-            </div>
-          `).join('');
+      const html = filtered.length === 0
+        ? '<div class="empty-state">No tasks in this view</div>'
+        : filtered.map(task => {
+          const isExpanded = expandedNotes[task.id];
+          let cardClass = 'task-card';
+          if (task.completed) cardClass += ' is-complete';
+          if (task.followup) cardClass += ' is-followup';
 
-      const targetList = currentTab === 'master' ? 'masterList' : 'todoList';
-      document.getElementById(targetList).innerHTML = html;
+          let notesHtml = '';
+          if (Array.isArray(task.notes) && task.notes.length > 0) {
+            notesHtml = '<div class="task-notes-display">' +
+              task.notes.map(n => '<div class="note-entry"><span class="note-date">' + n.date + ':</span> ' + escapeHtml(n.text) + '</div>').join('') +
+              '</div>';
+          }
+
+          let editorHtml = '';
+          if (isExpanded) {
+            editorHtml = '<div class="notes-editor">' +
+              '<textarea id="note-input-' + task.id + '" placeholder="Add a note..."></textarea>' +
+              '<button onclick="addNote(' + task.id + ')">Save Note</button>' +
+              '</div>';
+          }
+
+          return '<div class="' + cardClass + '">' +
+            '<div class="task-top">' +
+              '<span class="task-number">#' + task.number + '</span>' +
+              '<div class="task-content">' +
+                '<div class="task-text ' + (task.completed ? 'done' : '') + '">' + escapeHtml(task.text) + getStatusBadges(task) + '</div>' +
+              '</div>' +
+              '<div class="task-actions">' +
+                '<button class="btn-complete" onclick="completeTask(' + task.id + ')">' + (task.completed ? 'Undo' : '✓') + '</button>' +
+                '<button class="btn-followup" onclick="toggleFollowup(' + task.id + ')">' + (task.followup ? 'Remove F/U' : 'F/U') + '</button>' +
+                '<button class="btn-notes" onclick="toggleNotesEditor(' + task.id + ')">Notes</button>' +
+              '</div>' +
+            '</div>' +
+            notesHtml +
+            editorHtml +
+          '</div>';
+        }).join('');
+
+      document.getElementById('taskList').innerHTML = html;
 
       const total = tasks.length;
       const complete = tasks.filter(t => t.completed).length;
-      const remaining = total - complete;
-      const percent = total > 0 ? Math.round((complete / total) * 100) : 0;
+      const remaining = tasks.filter(t => !t.completed).length;
+      const followup = tasks.filter(t => t.followup).length;
 
       document.getElementById('totalCount').textContent = total;
       document.getElementById('completeCount').textContent = complete;
       document.getElementById('remainingCount').textContent = remaining;
-      document.getElementById('percentCount').textContent = percent + '%';
-    }
-
-    function escapeHtml(text) {
-      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-      return text.replace(/[&<>"']/g, m => map[m]);
+      document.getElementById('followupCount').textContent = followup;
     }
 
     document.getElementById('newTask').addEventListener('keypress', e => {
