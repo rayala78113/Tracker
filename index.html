@@ -124,7 +124,7 @@
   <script>
     const SUPABASE_URL = 'https://jbnufforfpgawnawgujv.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpibnVmZm9yZnBnYXduYXdndWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ1MjI1OTIsImV4cCI6MjA1MDA5ODU5Mn0.FT3z6Yedzrc-lL8cnIKC4Q_ydJE-BW3i_WCUdcSNEco';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let tasks = [];
     let currentTab = 'master';
@@ -159,11 +159,11 @@
     ];
 
     async function initializeDatabase() {
-      const { data: existingTasks, error: fetchError } = await supabase
+      const { data: existingTasks, error: fetchError } = await supabaseClient
         .from('tasks')
         .select('*');
 
-      if (fetchError && fetchError.code !== 'PGRST116') {
+      if (fetchError) {
         console.error('Error fetching tasks:', fetchError);
       }
 
@@ -177,7 +177,7 @@
           date_added: new Date().toISOString().split('T')[0]
         }));
 
-        const { error: insertError } = await supabase
+        const { error: insertError } = await supabaseClient
           .from('tasks')
           .insert(tasksToInsert);
 
@@ -186,13 +186,14 @@
     }
 
     async function loadTasks() {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('tasks')
         .select('*')
         .order('number', { ascending: true });
 
       if (error) {
         console.error('Error loading tasks:', error);
+        document.getElementById('loadingMessage').textContent = 'Error loading tasks. Check console.';
         return;
       }
 
@@ -234,7 +235,7 @@
         date_added: new Date().toISOString().split('T')[0]
       };
 
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('tasks')
         .insert([newTask])
         .select();
@@ -255,7 +256,7 @@
 
       task.completed = !task.completed;
 
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('tasks')
         .update({ completed: task.completed })
         .eq('id', id);
@@ -270,7 +271,7 @@
 
       task.followup = !task.followup;
 
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('tasks')
         .update({ followup: task.followup })
         .eq('id', id);
@@ -301,7 +302,7 @@
       
       task.notes.push(newNote);
 
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('tasks')
         .update({ notes: task.notes })
         .eq('id', id);
