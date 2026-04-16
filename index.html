@@ -74,6 +74,7 @@
 
     .empty-state { text-align: center; padding: 2rem; color: #999; font-size: 14px; }
     .hidden { display: none; }
+    .loading { text-align: center; padding: 2rem; color: #666; }
   </style>
 </head>
 <body>
@@ -115,113 +116,94 @@
       </div>
     </div>
 
+    <div id="loadingMessage" class="loading">Loading tasks...</div>
     <div class="task-list" id="taskList"></div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    const SUPABASE_URL = 'https://jbnufforfpgawnawgujv.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpibnVmZm9yZnBnYXduYXdndWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ1MjI1OTIsImV4cCI6MjA1MDA5ODU5Mn0.FT3z6Yedzrc-lL8cnIKC4Q_ydJE-BW3i_WCUdcSNEco';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     let tasks = [];
     let currentTab = 'master';
     let expandedNotes = {};
 
     const initialTasks = [
-      "PHMSA OSRP Plan – LOC",
-      "Check SDS sheets at each location",
-      "Ensure chemical awareness from team ops",
-      "SOPs reviewed",
-      "MOC for TSAR Block Valves",
-      "MOC for chemical change",
-      "MOC for FCT water drop coupon",
-      "MOC for LACT 5 PCV (back pressure valve)",
-      "Lessons learned from audit – revisions/forms",
-      "Updated forms for line crossing",
-      "Order peroxide for test",
-      "Send Ryan SPCC findings for Casey corrections",
-      "SPCC FCT tanks – questions with attorneys",
-      "LONO Request – reply pending",
-      "Schedule SPL Testing",
-      "Update for IMP plan",
-      "Update for foreign line crossing/exposed pipeline report",
-      "VFD PM at Elm",
-      "Check all ESD shutdowns at Elm",
-      "Setpoint PSVs at Elmendorf",
-      "LACT 5 back pressure valve",
-      "Rebuild MOV 71 actuator",
-      "Fireproofing at Elmendorf",
-      "Paint pipeline valves",
-      "FCT boosters / strainers PM",
-      "Transfer pump installation (Elmendorf)",
-      "Tank 102 cleanout plan",
-      "Filter pod baskets remake (Angus)",
-      "Filter screens – TSAR pipeline entry strainer",
-      "FCT pad repair",
-      "Block Valve #4 actuator mounting",
-      "Schedule PSV swap-outs",
-      "Schedule valve inspections",
-      "Order proving valve – TSAR incoming skid",
-      "Source correct replacement valve (David WO)",
-      "Issue PO – MIS pig run XYZ (TSAR jumper)",
-      "PO for transfer pump (United)",
-      "Paradigm Req 3452",
-      "Block Valve #4 painting",
-      "Block Valve #3 painting",
-      "Train pig (Kevin Wheeler)",
-      "Check sample pot lineup – Elm",
-      "Water drop inspection – TSAR entry skid",
-      "Tank inspections – Pinnacle",
-      "Piping inspection – Elm & FCT",
-      "Coupon report",
-      "Tank inspection review with David",
-      "SPL Testing execution",
-      "FT1 Meter Proving (Calibration)",
-      "Annual pressure transmitter testing",
-      "Truck inspections (daily)",
-      "4603 water draw",
-      "Monthly fire extinguisher inspections (FCT & Elm)",
-      "Investigate LEL alarms – FCT (P1002)",
-      "Update KNPS overview (alarm responsibilities)",
-      "Upload DuPont schedule and align coverage",
-      "Confirm ACS PM completed – Elmendorf",
-      "Air vent cleaning quotes",
-      "Follow up MIS – commodity release alarm",
-      "Firewall/comms update request (MIS)",
-      "MOC – add LEL tags to SCADA",
-      "Backup internet (Jacob)",
-      "GIS mapping (Meghan – Cumberland)",
-      "Enable TMS6 login all locations",
-      "Upload IMP to SharePoint",
-      "Meter proving sheets saved",
-      "Legacy Rockwell software",
-      "Cayman Cargo MSA",
-      "Adam Grier MSA",
-      "Wade & Vic connection agreement",
-      "Watch Aerial coordination",
-      "Rosen report",
-      "Refined Land Services invoice",
-      "FCT SDV / PSV study meeting",
-      "Transfer pump setup (engineering)"
+      "PHMSA OSRP Plan – LOC", "Check SDS sheets at each location", "Ensure chemical awareness from team ops",
+      "SOPs reviewed", "MOC for TSAR Block Valves", "MOC for chemical change", "MOC for FCT water drop coupon",
+      "MOC for LACT 5 PCV (back pressure valve)", "Lessons learned from audit – revisions/forms",
+      "Updated forms for line crossing", "Order peroxide for test", "Send Ryan SPCC findings for Casey corrections",
+      "SPCC FCT tanks – questions with attorneys", "LONO Request – reply pending", "Schedule SPL Testing",
+      "Update for IMP plan", "Update for foreign line crossing/exposed pipeline report", "VFD PM at Elm",
+      "Check all ESD shutdowns at Elm", "Setpoint PSVs at Elmendorf", "LACT 5 back pressure valve",
+      "Rebuild MOV 71 actuator", "Fireproofing at Elmendorf", "Paint pipeline valves", "FCT boosters / strainers PM",
+      "Transfer pump installation (Elmendorf)", "Tank 102 cleanout plan", "Filter pod baskets remake (Angus)",
+      "Filter screens – TSAR pipeline entry strainer", "FCT pad repair", "Block Valve #4 actuator mounting",
+      "Schedule PSV swap-outs", "Schedule valve inspections", "Order proving valve – TSAR incoming skid",
+      "Source correct replacement valve (David WO)", "Issue PO – MIS pig run XYZ (TSAR jumper)",
+      "PO for transfer pump (United)", "Paradigm Req 3452", "Block Valve #4 painting", "Block Valve #3 painting",
+      "Train pig (Kevin Wheeler)", "Check sample pot lineup – Elm", "Water drop inspection – TSAR entry skid",
+      "Tank inspections – Pinnacle", "Piping inspection – Elm & FCT", "Coupon report",
+      "Tank inspection review with David", "SPL Testing execution", "FT1 Meter Proving (Calibration)",
+      "Annual pressure transmitter testing", "Truck inspections (daily)", "4603 water draw",
+      "Monthly fire extinguisher inspections (FCT & Elm)", "Investigate LEL alarms – FCT (P1002)",
+      "Update KNPS overview (alarm responsibilities)", "Upload DuPont schedule and align coverage",
+      "Confirm ACS PM completed – Elmendorf", "Air vent cleaning quotes", "Follow up MIS – commodity release alarm",
+      "Firewall/comms update request (MIS)", "MOC – add LEL tags to SCADA", "Backup internet (Jacob)",
+      "GIS mapping (Meghan – Cumberland)", "Enable TMS6 login all locations", "Upload IMP to SharePoint",
+      "Meter proving sheets saved", "Legacy Rockwell software", "Cayman Cargo MSA", "Adam Grier MSA",
+      "Wade & Vic connection agreement", "Watch Aerial coordination", "Rosen report", "Refined Land Services invoice",
+      "FCT SDV / PSV study meeting", "Transfer pump setup (engineering)"
     ];
 
-    function init() {
-      const saved = localStorage.getItem('tsar-tasks-v4');
-      if (saved) {
-        tasks = JSON.parse(saved);
-      } else {
-        tasks = initialTasks.map((text, i) => ({
-          id: i + 1,
+    async function initializeDatabase() {
+      const { data: existingTasks, error: fetchError } = await supabase
+        .from('tasks')
+        .select('*');
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('Error fetching tasks:', fetchError);
+      }
+
+      if (!existingTasks || existingTasks.length === 0) {
+        const tasksToInsert = initialTasks.map((text, i) => ({
           number: i + 1,
           text: text,
           completed: false,
           followup: false,
           notes: [],
-          dateAdded: new Date().toISOString().split('T')[0]
+          date_added: new Date().toISOString().split('T')[0]
         }));
-        save();
+
+        const { error: insertError } = await supabase
+          .from('tasks')
+          .insert(tasksToInsert);
+
+        if (insertError) console.error('Error inserting initial tasks:', insertError);
       }
+    }
+
+    async function loadTasks() {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .order('number', { ascending: true });
+
+      if (error) {
+        console.error('Error loading tasks:', error);
+        return;
+      }
+
+      tasks = data || [];
+      document.getElementById('loadingMessage').style.display = 'none';
       render();
     }
 
-    function save() {
-      localStorage.setItem('tsar-tasks-v4', JSON.stringify(tasks));
+    async function init() {
+      await initializeDatabase();
+      await loadTasks();
     }
 
     function switchTab(tab) {
@@ -237,41 +219,64 @@
       render();
     }
 
-    function addTask() {
+    async function addTask() {
       const input = document.getElementById('newTask');
       const text = input.value.trim();
       if (!text) return;
+
       const newNumber = Math.max(...tasks.map(t => t.number), 0) + 1;
-      tasks.push({
-        id: Date.now(),
+      const newTask = {
         number: newNumber,
         text: text,
         completed: false,
         followup: false,
         notes: [],
-        dateAdded: new Date().toISOString().split('T')[0]
-      });
+        date_added: new Date().toISOString().split('T')[0]
+      };
+
+      const { data, error } = await supabase
+        .from('tasks')
+        .insert([newTask])
+        .select();
+
+      if (error) {
+        console.error('Error adding task:', error);
+        return;
+      }
+
+      tasks.push(data[0]);
       input.value = '';
-      save();
       render();
     }
 
-    function completeTask(id) {
+    async function completeTask(id) {
       const task = tasks.find(t => t.id === id);
-      if (task) {
-        task.completed = !task.completed;
-        save();
-        render();
-      }
+      if (!task) return;
+
+      task.completed = !task.completed;
+
+      const { error } = await supabase
+        .from('tasks')
+        .update({ completed: task.completed })
+        .eq('id', id);
+
+      if (error) console.error('Error updating task:', error);
+      render();
     }
 
-    function toggleFollowup(id) {
+    async function toggleFollowup(id) {
       const task = tasks.find(t => t.id === id);
-      if (task) {
-        task.followup = !task.followup;
-        save();
-        render();
-      }
+      if (!task) return;
+
+      task.followup = !task.followup;
+
+      const { error } = await supabase
+        .from('tasks')
+        .update({ followup: task.followup })
+        .eq('id', id);
+
+      if (error) console.error('Error updating followup:', error);
+      render();
     }
 
     function toggleNotesEditor(id) {
@@ -279,21 +284,35 @@
       render();
     }
 
-    function addNote(id) {
+    async function addNote(id) {
       const textarea = document.getElementById('note-input-' + id);
       const text = textarea.value.trim();
       if (!text) return;
+
       const task = tasks.find(t => t.id === id);
-      if (task) {
-        if (!Array.isArray(task.notes)) task.notes = [];
-        task.notes.push({
-          text: text,
-          date: new Date().toISOString().split('T')[0]
-        });
-        textarea.value = '';
-        save();
-        render();
+      if (!task) return;
+
+      if (!Array.isArray(task.notes)) task.notes = [];
+      
+      const newNote = {
+        text: text,
+        date: new Date().toISOString().split('T')[0]
+      };
+      
+      task.notes.push(newNote);
+
+      const { error } = await supabase
+        .from('tasks')
+        .update({ notes: task.notes })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error adding note:', error);
+        return;
       }
+
+      textarea.value = '';
+      render();
     }
 
     function getStatusBadges(task) {
