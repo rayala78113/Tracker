@@ -6,418 +6,103 @@
 <title>TSAR Task Tracker</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
-
   :root {
-    --bg: #0d0f12;
-    --surface: #13161a;
-    --surface2: #1a1e24;
-    --border: #252a32;
-    --border2: #2e343e;
-    --text: #e8eaf0;
-    --text2: #8b92a0;
-    --text3: #555d6b;
-    --accent: #e8a020;
-    --accent2: #c47c0a;
-    --green: #2ecc71;
-    --red: #e74c3c;
-    --blue: #3498db;
-    --purple: #9b59b6;
-    --orange: #e67e22;
+    --bg:#0d0f12;--surface:#13161a;--surface2:#1a1e24;--border:#252a32;--border2:#2e343e;
+    --text:#e8eaf0;--text2:#8b92a0;--text3:#555d6b;--accent:#e8a020;--accent2:#c47c0a;
+    --green:#2ecc71;--red:#e74c3c;--blue:#3498db;--purple:#9b59b6;--orange:#e67e22;
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'IBM Plex Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 14px;
-  }
-
-  .header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 52px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-  }
-
-  .logo-icon {
-    width: 26px; height: 26px;
-    background: var(--accent);
-    border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; color: #000; font-weight: 700;
-  }
-
-  .user-badge {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 12px;
-    color: var(--text2);
-    cursor: pointer;
-  }
-
-  .user-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
-
-  .tabs {
-    display: flex;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 8px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .tabs::-webkit-scrollbar { display: none; }
-
-  .tab {
-    padding: 10px 10px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text3);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.15s;
-    display: flex; align-items: center; gap: 5px;
-    margin-bottom: -1px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .tab:hover { color: var(--text2); }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-  .tab-badge {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1px 6px;
-    font-size: 10px;
-    font-family: 'IBM Plex Mono', monospace;
-  }
-
-  .tab.active .tab-badge {
-    background: rgba(232,160,32,0.15);
-    border-color: rgba(232,160,32,0.3);
-    color: var(--accent);
-  }
-
-  .tab-ryan .tab-badge { background: rgba(52,152,219,0.15); border-color: rgba(52,152,219,0.3); color: var(--blue); }
-  .tab-ryan.active { color: var(--blue); border-bottom-color: var(--blue); }
-
-  .stats-bar {
-    display: flex;
-    gap: 1px;
-    background: var(--border);
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .stats-bar::-webkit-scrollbar { display: none; }
-
-  .stat {
-    flex: 1;
-    min-width: 68px;
-    background: var(--surface);
-    padding: 9px 10px;
-  }
-
-  .stat-num {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 17px;
-    font-weight: 600;
-    line-height: 1;
-  }
-
-  .stat-label { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
-  .stat-num.total { color: var(--text); }
-  .stat-num.complete { color: var(--green); }
-  .stat-num.todo { color: var(--accent); }
-  .stat-num.followup { color: var(--purple); }
-  .stat-num.ryan { color: var(--blue); }
-
-  .toolbar {
-    padding: 10px 16px;
-    display: flex; gap: 8px; align-items: center;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
-
-  .search {
-    flex: 1;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 7px 12px;
-    color: var(--text);
-    font-size: 13px;
-    font-family: 'IBM Plex Sans', sans-serif;
-    outline: none;
-  }
-  .search::placeholder { color: var(--text3); }
-  .search:focus { border-color: var(--border2); }
-
-  .btn {
-    padding: 7px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--text2);
-    transition: all 0.15s;
-    font-family: 'IBM Plex Sans', sans-serif;
-    white-space: nowrap;
-  }
-  .btn:hover { border-color: var(--border2); color: var(--text); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .btn-primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
-  .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); color: #000; }
-
-  .btn-ryan { background: rgba(52,152,219,0.15); color: var(--blue); border-color: rgba(52,152,219,0.3); }
-  .btn-ryan:hover { background: rgba(52,152,219,0.25); }
-
-  .btn-complete { background: rgba(46,204,113,0.12); color: var(--green); border-color: rgba(46,204,113,0.25); font-size: 11px; padding: 4px 8px; }
-
-  .content { padding: 16px; max-width: 900px; }
-
-  .section-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--text3);
-    margin-bottom: 8px;
-    margin-top: 18px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .task-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-bottom: 6px;
-    overflow: hidden;
-    transition: border-color 0.15s;
-  }
-  .task-card:hover { border-color: var(--border2); }
-  .task-card.ryan-assigned { border-left: 3px solid var(--blue); }
-  .task-card.completed { opacity: 0.55; }
-
-  .task-main {
-    padding: 11px 12px;
-    display: flex; align-items: flex-start; gap: 10px;
-    cursor: pointer;
-  }
-
-  .task-check {
-    width: 15px; height: 15px;
-    border: 1px solid var(--border2);
-    border-radius: 3px;
-    flex-shrink: 0;
-    margin-top: 2px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px;
-  }
-  .task-check.done { background: var(--green); border-color: var(--green); color: #000; }
-
-  .task-body { flex: 1; min-width: 0; }
-
-  .task-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
-  .task-title.done { text-decoration: line-through; color: var(--text3); }
-
-  .task-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-
-  .tag {
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 500;
-  }
-  .tag-section { background: var(--surface2); border: 1px solid var(--border); color: var(--text3); }
-  .tag-date { color: var(--text3); font-size: 10px; }
-  .tag-followup { background: rgba(155,89,182,0.15); border: 1px solid rgba(155,89,182,0.3); color: var(--purple); }
-  .tag-complete { background: rgba(46,204,113,0.12); border: 1px solid rgba(46,204,113,0.25); color: var(--green); }
-  .tag-ryan { background: rgba(52,152,219,0.12); border: 1px solid rgba(52,152,219,0.25); color: var(--blue); }
-  .tag-completedby { background: rgba(46,204,113,0.08); border: 1px solid rgba(46,204,113,0.2); color: #5dade2; }
-
-  .task-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-
-  .task-expanded { border-top: 1px solid var(--border); padding: 12px; background: var(--surface2); display: none; }
-  .task-expanded.open { display: block; }
-
-  .expand-row { display: flex; gap: 14px; }
-  .expand-col { flex: 1; }
-  .expand-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); font-family: 'IBM Plex Mono', monospace; margin-bottom: 5px; }
-  .expand-text { font-size: 12px; color: var(--text2); line-height: 1.5; min-height: 28px; }
-
-  .attachments { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
-  .attach-list { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
-
-  .attach-item {
-    display: flex; align-items: center; gap: 5px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 11px;
-    color: var(--text2);
-    cursor: pointer;
-  }
-  .attach-item:hover { border-color: var(--accent); color: var(--accent); }
-
-  .attach-upload {
-    display: flex; align-items: center; gap: 5px;
-    border: 1px dashed var(--border2);
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 11px;
-    color: var(--text3);
-    cursor: pointer;
-  }
-  .attach-upload:hover { border-color: var(--accent); color: var(--accent); }
-
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.75);
-    z-index: 200;
-    align-items: center; justify-content: center;
-    padding: 16px;
-  }
-  .modal-overlay.open { display: flex; }
-
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 10px;
-    width: 100%;
-    max-width: 480px;
-    max-height: 85vh;
-    overflow-y: auto;
-    padding: 20px;
-  }
-
-  .modal-title {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--accent);
-    margin-bottom: 18px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  .modal-field { margin-bottom: 12px; }
-  .modal-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; font-family: 'IBM Plex Mono', monospace; }
-
-  .form-input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px 10px;
-    color: var(--text);
-    font-size: 13px;
-    font-family: 'IBM Plex Sans', sans-serif;
-    outline: none;
-  }
-  .form-input:focus { border-color: var(--accent); }
-  .form-input::placeholder { color: var(--text3); }
-  select.form-input { cursor: pointer; }
-  textarea.form-input { resize: vertical; }
-
-  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
-
-  .ryan-header {
-    background: linear-gradient(135deg, rgba(52,152,219,0.08), rgba(52,152,219,0.03));
-    border: 1px solid rgba(52,152,219,0.2);
-    border-radius: 8px;
-    padding: 12px 14px;
-    margin-bottom: 14px;
-    display: flex; align-items: center; gap: 10px;
-  }
-
-  .ryan-avatar {
-    width: 34px; height: 34px;
-    background: rgba(52,152,219,0.2);
-    border: 1px solid rgba(52,152,219,0.3);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700; color: var(--blue);
-    font-family: 'IBM Plex Mono', monospace;
-  }
-
-  .ryan-info h3 { font-size: 13px; font-weight: 600; color: var(--blue); }
-  .ryan-info p { font-size: 11px; color: var(--text3); margin-top: 2px; }
-
-  .toast {
-    position: fixed;
-    bottom: 20px; right: 16px; left: 16px;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 8px;
-    padding: 11px 14px;
-    font-size: 13px;
-    color: var(--text);
-    display: none;
-    z-index: 300;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-  }
-  .toast.show { display: flex; align-items: center; gap: 8px; }
-
-  .loading {
-    text-align: center;
-    padding: 48px 16px;
-    color: var(--text3);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-  }
-  .loading-dot { animation: pulse 1.2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
-
-  .empty-state { text-align: center; padding: 40px 0; color: var(--text3); font-size: 13px; }
-  .empty-icon { font-size: 28px; margin-bottom: 8px; }
-
-  .section-compliance .task-card { border-left: 2px solid var(--red); }
-  .section-maintenance .task-card { border-left: 2px solid var(--orange); }
-  .section-operations .task-card { border-left: 2px solid var(--blue); }
-  .section-admin .task-card { border-left: 2px solid var(--purple); }
-  .section-inspections .task-card { border-left: 2px solid var(--green); }
-  .task-card.ryan-assigned { border-left: 3px solid var(--blue) !important; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;}
+  .logo{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--accent);}
+  .logo-icon{width:26px;height:26px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#000;font-weight:700;}
+  .user-badge{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--text2);cursor:pointer;}
+  .user-dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+  .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 8px;overflow-x:auto;scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{padding:10px 10px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;display:flex;align-items:center;gap:5px;margin-bottom:-1px;white-space:nowrap;flex-shrink:0;}
+  .tab:hover{color:var(--text2);}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .tab-badge{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1px 6px;font-size:10px;font-family:'IBM Plex Mono',monospace;}
+  .tab.active .tab-badge{background:rgba(232,160,32,.15);border-color:rgba(232,160,32,.3);color:var(--accent);}
+  .tab-ryan .tab-badge{background:rgba(52,152,219,.15);border-color:rgba(52,152,219,.3);color:var(--blue);}
+  .tab-ryan.active{color:var(--blue);border-bottom-color:var(--blue);}
+  .stats-bar{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+  .stats-bar::-webkit-scrollbar{display:none;}
+  .stat{flex:1;min-width:68px;background:var(--surface);padding:9px 10px;}
+  .stat-num{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;line-height:1;}
+  .stat-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+  .stat-num.total{color:var(--text);}.stat-num.complete{color:var(--green);}.stat-num.todo{color:var(--accent);}.stat-num.followup{color:var(--purple);}.stat-num.ryan{color:var(--blue);}
+  .toolbar{padding:10px 16px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--border);background:var(--surface);}
+  .search{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 12px;color:var(--text);font-size:13px;font-family:'IBM Plex Sans',sans-serif;outline:none;}
+  .search::placeholder{color:var(--text3);}
+  .btn{padding:7px 12px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:all .15s;font-family:'IBM Plex Sans',sans-serif;white-space:nowrap;}
+  .btn:hover{border-color:var(--border2);color:var(--text);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600;}
+  .btn-primary:hover{background:var(--accent2);color:#000;}
+  .btn-ryan{background:rgba(52,152,219,.15);color:var(--blue);border-color:rgba(52,152,219,.3);}
+  .btn-complete{background:rgba(46,204,113,.12);color:var(--green);border-color:rgba(46,204,113,.25);}
+  .btn-followup{background:rgba(155,89,182,.12);color:var(--purple);border-color:rgba(155,89,182,.3);}
+  .btn-followup.flagged{background:rgba(155,89,182,.3);}
+  .content{padding:16px;max-width:900px;}
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-bottom:8px;margin-top:18px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+  .task-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;overflow:hidden;transition:border-color .15s;}
+  .task-card:hover{border-color:var(--border2);}
+  .task-card.ryan-assigned{border-left:3px solid var(--blue)!important;}
+  .task-card.is-complete{border-left:3px solid var(--green)!important;}
+  .section-compliance .task-card{border-left:2px solid var(--red);}
+  .section-maintenance .task-card{border-left:2px solid var(--orange);}
+  .section-operations .task-card{border-left:2px solid var(--blue);}
+  .section-admin .task-card{border-left:2px solid var(--purple);}
+  .section-inspections .task-card{border-left:2px solid var(--green);}
+  .task-main{padding:11px 12px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;}
+  .task-check{width:15px;height:15px;border:1px solid var(--border2);border-radius:3px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:9px;}
+  .task-check.done{background:var(--green);border-color:var(--green);color:#000;}
+  .task-body{flex:1;min-width:0;}
+  .task-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;line-height:1.4;}
+  .task-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .tag{font-size:10px;padding:2px 6px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-weight:500;}
+  .tag-section{background:var(--surface2);border:1px solid var(--border);color:var(--text3);}
+  .tag-date{color:var(--text3);font-size:10px;}
+  .tag-followup{background:rgba(155,89,182,.15);border:1px solid rgba(155,89,182,.3);color:var(--purple);}
+  .tag-ryan{background:rgba(52,152,219,.12);border:1px solid rgba(52,152,219,.25);color:var(--blue);}
+  .tag-completedby{background:rgba(46,204,113,.15);border:1px solid rgba(46,204,113,.3);color:var(--green);font-weight:600;}
+  .task-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+  .task-expanded{border-top:1px solid var(--border);padding:12px;background:var(--surface2);display:none;}
+  .task-expanded.open{display:block;}
+  .expand-row{display:flex;gap:14px;flex-wrap:wrap;}
+  .expand-col{flex:1;min-width:140px;}
+  .expand-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-family:'IBM Plex Mono',monospace;margin-bottom:5px;}
+  .expand-text{font-size:12px;color:var(--text2);line-height:1.5;min-height:24px;}
+  .expand-actions{margin-top:10px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:16px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border:1px solid var(--border2);border-radius:10px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;padding:20px;}
+  .modal-title{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--accent);margin-bottom:18px;text-transform:uppercase;letter-spacing:.08em;}
+  .modal-field{margin-bottom:12px;}
+  .modal-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:'IBM Plex Mono',monospace;}
+  .form-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:13px;font-family:'IBM Plex Sans',sans-serif;outline:none;}
+  .form-input:focus{border-color:var(--accent);}
+  .form-input::placeholder{color:var(--text3);}
+  select.form-input{cursor:pointer;}
+  textarea.form-input{resize:vertical;}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+  .ryan-header{background:linear-gradient(135deg,rgba(52,152,219,.08),rgba(52,152,219,.03));border:1px solid rgba(52,152,219,.2);border-radius:8px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+  .ryan-avatar{width:34px;height:34px;background:rgba(52,152,219,.2);border:1px solid rgba(52,152,219,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--blue);font-family:'IBM Plex Mono',monospace;}
+  .ryan-info h3{font-size:13px;font-weight:600;color:var(--blue);}
+  .ryan-info p{font-size:11px;color:var(--text3);margin-top:2px;}
+  .toast{position:fixed;bottom:20px;right:16px;left:16px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:11px 14px;font-size:13px;color:var(--text);display:none;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+  .toast.show{display:flex;align-items:center;gap:8px;}
+  .loading{text-align:center;padding:48px 16px;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:12px;}
+  .empty-state{text-align:center;padding:40px 0;color:var(--text3);font-size:13px;}
+  .empty-icon{font-size:28px;margin-bottom:8px;}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="logo">
-    <div class="logo-icon">T</div>
-    TSAR TRACKER
-  </div>
+  <div class="logo"><div class="logo-icon">T</div>TSAR TRACKER</div>
   <div class="user-badge" onclick="switchUser()">
     <div class="user-dot"></div>
     <span id="current-user">Rolando Ayala</span>
@@ -445,20 +130,14 @@
   <button class="btn btn-primary" onclick="openAddModal()">+ Add</button>
 </div>
 
-<div class="content" id="main-content">
-  <div class="loading"><span class="loading-dot">Loading tasks…</span></div>
-</div>
+<div class="content" id="main-content"><div class="loading">Loading tasks…</div></div>
 
 <!-- ADD MODAL -->
 <div class="modal-overlay" id="add-modal">
   <div class="modal">
     <div class="modal-title">— New Task</div>
-    <div class="modal-field">
-      <div class="modal-label">Task Title</div>
-      <input class="form-input" id="new-title" placeholder="Describe the task…">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Section</div>
+    <div class="modal-field"><div class="modal-label">Task Title</div><input class="form-input" id="new-title" placeholder="Describe the task…"></div>
+    <div class="modal-field"><div class="modal-label">Section</div>
       <select class="form-input" id="new-section">
         <option value="Compliance">🔴 Compliance / Regulatory</option>
         <option value="Maintenance">🔧 Maintenance / Equipment</option>
@@ -467,17 +146,7 @@
         <option value="Admin">🗂️ Admin / IT / Vendors</option>
       </select>
     </div>
-    <div class="modal-field">
-      <div class="modal-label">Notes</div>
-      <textarea class="form-input" id="new-notes" placeholder="Additional context…" style="height:72px"></textarea>
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Flag for Follow-Up?</div>
-      <select class="form-input" id="new-followup">
-        <option value="false">No</option>
-        <option value="true">Yes</option>
-      </select>
-    </div>
+    <div class="modal-field"><div class="modal-label">Notes</div><textarea class="form-input" id="new-notes" placeholder="Additional context…" style="height:72px"></textarea></div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('add-modal')">Cancel</button>
       <button class="btn btn-primary" id="add-btn" onclick="addTask()">Add Task</button>
@@ -485,15 +154,25 @@
   </div>
 </div>
 
+<!-- EDIT NOTES MODAL -->
+<div class="modal-overlay" id="notes-modal">
+  <div class="modal">
+    <div class="modal-title">— Edit Notes</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.4" id="edit-notes-title"></div>
+    <div class="modal-field"><div class="modal-label">Notes</div><textarea class="form-input" id="edit-notes-text" placeholder="Add notes, context, updates…" style="height:120px"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('notes-modal')">Cancel</button>
+      <button class="btn btn-primary" id="save-notes-btn" onclick="saveNotes()">Save Notes</button>
+    </div>
+  </div>
+</div>
+
 <!-- COMPLETE MODAL -->
 <div class="modal-overlay" id="complete-modal">
   <div class="modal">
-    <div class="modal-title" style="color:var(--blue)">— Mark Complete</div>
+    <div class="modal-title" style="color:var(--green)">— Mark Complete</div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.4" id="complete-task-title"></div>
-    <div class="modal-field">
-      <div class="modal-label">Completion Notes</div>
-      <textarea class="form-input" id="complete-notes" placeholder="What was done? Any follow-up needed?" style="height:88px"></textarea>
-    </div>
+    <div class="modal-field"><div class="modal-label">Completion Notes</div><textarea class="form-input" id="complete-notes" placeholder="What was done? Any notes?" style="height:88px"></textarea></div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('complete-modal')">Cancel</button>
       <button class="btn btn-complete" style="font-size:13px;padding:7px 14px;" id="confirm-btn" onclick="confirmComplete()">✓ Mark Complete</button>
@@ -501,374 +180,216 @@
   </div>
 </div>
 
-<div class="toast" id="toast">
-  <span id="toast-icon">✓</span>
-  <span id="toast-msg"></span>
-</div>
+<div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>
 
 <script>
-// ─── SUPABASE CONFIG ─────────────────────────────────────────
-const SUPABASE_URL = 'https://jbnufforfpgawnawgujv.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpibnVmZm9yZnBnYXduYXdndWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNzk4ODEsImV4cCI6MjA5MTg1NTg4MX0.Zy4dcmb99FsMUDKMxn2ASsQ2ZmGO0aeCumO21jD8EBY';
-const HEADERS = {
-  'Content-Type': 'application/json',
-  'apikey': SUPABASE_KEY,
-  'Authorization': 'Bearer ' + SUPABASE_KEY
-};
+const SUPABASE_URL='https://jbnufforfpgawnawgujv.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpibnVmZm9yZnBnYXduYXdndWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNzk4ODEsImV4cCI6MjA5MTg1NTg4MX0.Zy4dcmb99FsMUDKMxn2ASsQ2ZmGO0aeCumO21jD8EBY';
+const H={'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
 
-async function sbGet(query) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${query}`, { headers: HEADERS });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
+async function sbGet(q){const r=await fetch(`${SUPABASE_URL}/rest/v1/${q}`,{headers:H});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function sbPost(table,data){const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(data)});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function sbPatch(table,id,data){const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`,{method:'PATCH',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(data)});if(!r.ok)throw new Error(await r.text());return r.json();}
 
-async function sbPost(table, data) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-    method: 'POST',
-    headers: { ...HEADERS, 'Prefer': 'return=representation' },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
+let currentTab='master',currentUser='Rolando',expandedId=null,completingId=null,editingNotesId=null,tasks=[];
 
-async function sbPatch(table, id, data) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-    method: 'PATCH',
-    headers: { ...HEADERS, 'Prefer': 'return=representation' },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-// ─── STATE ───────────────────────────────────────────────────
-let currentTab = 'master';
-let currentUser = 'Rolando';
-let expandedId = null;
-let completingId = null;
-let tasks = [];
-let loading = false;
-
-// ─── LOAD TASKS ──────────────────────────────────────────────
-async function loadTasks() {
-  try {
-    const data = await sbGet('tasks?select=*&order=created_at.asc');
-    // Normalize field names from Supabase snake_case
-    tasks = data.map(r => ({
-      id: r.id,
-      title: r.text || r.title || '',
-      section: r.section || 'Admin',
-      status: r.completed ? 'complete' : 'incomplete',
-      followup: r.followup || false,
-      notes: r.notes || '',
-      date: r.date_added ? new Date(r.date_added).toLocaleDateString('en-US') : new Date(r.created_at).toLocaleDateString('en-US'),
-      assignedTo: r.assigned_to || null,
-      completedBy: r.completed_by || null,
-      completedNotes: r.completion_notes || '',
-      attachments: r.attachments || [],
-      _raw: r
+async function loadTasks(){
+  try{
+    const data=await sbGet('tasks?select=*&order=created_at.asc');
+    tasks=data.map(r=>({
+      id:r.id,title:r.text||r.title||'',section:r.section||'Admin',
+      status:r.completed?'complete':'incomplete',followup:r.followup||false,
+      notes:r.notes||'',
+      date:r.date_added?new Date(r.date_added).toLocaleDateString('en-US'):new Date(r.created_at).toLocaleDateString('en-US'),
+      assignedTo:r.assigned_to||null,completedBy:r.completed_by||null,completedNotes:r.completion_notes||''
     }));
-    updateStats();
-    renderTasks();
-  } catch(e) {
-    console.error('Load error:', e);
-    document.getElementById('main-content').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">⚠️</div>
-        <div style="color:var(--red);margin-bottom:8px">Could not load tasks</div>
-        <div style="font-size:11px;color:var(--text3)">${e.message}</div>
-        <button class="btn" style="margin-top:12px" onclick="loadTasks()">Retry</button>
-      </div>`;
+    updateStats();renderTasks();
+  }catch(e){
+    document.getElementById('main-content').innerHTML=`<div class="empty-state"><div class="empty-icon">⚠️</div><div style="color:var(--red);margin-bottom:8px">Could not load tasks</div><div style="font-size:11px;color:var(--text3)">${e.message}</div><button class="btn" style="margin-top:12px" onclick="loadTasks()">Retry</button></div>`;
   }
 }
 
-// ─── UTILS ───────────────────────────────────────────────────
-function showToast(msg, icon='✓') {
-  const t = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg;
-  document.getElementById('toast-icon').textContent = icon;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
+function showToast(msg,icon='✓'){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;document.getElementById('toast-icon').textContent=icon;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
 
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-function openAddModal() {
+function openAddModal(){
   document.getElementById('add-modal').classList.add('open');
-  document.getElementById('new-title').value = '';
-  document.getElementById('new-notes').value = '';
-  document.getElementById('new-followup').value = 'false';
-  setTimeout(() => document.getElementById('new-title').focus(), 50);
+  document.getElementById('new-title').value='';document.getElementById('new-notes').value='';
+  setTimeout(()=>document.getElementById('new-title').focus(),50);
 }
 
-async function addTask() {
-  const title = document.getElementById('new-title').value.trim();
-  if (!title) return;
-  const btn = document.getElementById('add-btn');
-  btn.disabled = true; btn.textContent = 'Saving…';
-
-  try {
-    const payload = {
-      text: title,
-      section: document.getElementById('new-section').value,
-      completed: false,
-      followup: document.getElementById('new-followup').value === 'true',
-      notes: document.getElementById('new-notes').value,
-      date_added: new Date().toISOString(),
-      assigned_to: null,
-      completed_by: null,
-      completion_notes: '',
-      attachments: []
-    };
-    await sbPost('tasks', payload);
-    closeModal('add-modal');
-    await loadTasks();
-    showToast('Task added to Master', '📋');
-  } catch(e) {
-    showToast('Error: ' + e.message, '⚠️');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Add Task';
-  }
+async function addTask(){
+  const title=document.getElementById('new-title').value.trim();if(!title)return;
+  const btn=document.getElementById('add-btn');btn.disabled=true;btn.textContent='Saving…';
+  try{
+    await sbPost('tasks',{text:title,section:document.getElementById('new-section').value,completed:false,followup:false,notes:document.getElementById('new-notes').value,date_added:new Date().toISOString(),assigned_to:null,completed_by:null,completion_notes:'',attachments:[]});
+    closeModal('add-modal');await loadTasks();showToast('Task added to Master','📋');
+  }catch(e){showToast('Error: '+e.message,'⚠️');}
+  finally{btn.disabled=false;btn.textContent='Add Task';}
 }
 
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  expandedId = null;
-  renderTasks();
+function switchTab(tab){currentTab=tab;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');expandedId=null;renderTasks();}
+
+function switchUser(){
+  currentUser=currentUser==='Rolando'?'Ryan':'Rolando';
+  document.getElementById('current-user').textContent=currentUser==='Rolando'?'Rolando Ayala':'Ryan Mika';
+  switchTab(currentUser==='Ryan'?'ryan':'master');
+  showToast('Switched to '+(currentUser==='Rolando'?'Rolando Ayala':'Ryan Mika'),'👤');
 }
 
-function switchUser() {
-  currentUser = currentUser === 'Rolando' ? 'Ryan' : 'Rolando';
-  document.getElementById('current-user').textContent = currentUser === 'Rolando' ? 'Rolando Ayala' : 'Ryan Mika';
-  if (currentUser === 'Ryan') switchTab('ryan');
-  else switchTab('master');
-  showToast('Switched to ' + (currentUser === 'Rolando' ? 'Rolando Ayala' : 'Ryan Mika'), '👤');
+async function pushToRyan(id){
+  try{
+    await sbPatch('tasks',id,{assigned_to:'Ryan'});
+    const task=tasks.find(t=>t.id===id);if(task)task.assignedTo='Ryan';
+    updateStats();renderTasks();showToast('Pushed to Ryan — stays on To-Do too','📤');
+  }catch(e){showToast('Error: '+e.message,'⚠️');}
 }
 
-async function pushToRyan(id) {
-  try {
-    await sbPatch('tasks', id, { assigned_to: 'Ryan' });
-    const task = tasks.find(t => t.id === id);
-    if (task) { task.assignedTo = 'Ryan'; task._raw.assigned_to = 'Ryan'; }
-    updateStats();
-    renderTasks();
-    showToast('Pushed to Ryan — stays on your To-Do too', '📤');
-  } catch(e) {
-    showToast('Error: ' + e.message, '⚠️');
-  }
+function toggleExpand(id){expandedId=expandedId===id?null:id;renderTasks();}
+
+function openNotesModal(id){
+  editingNotesId=id;const task=tasks.find(t=>t.id===id);
+  document.getElementById('notes-modal').classList.add('open');
+  document.getElementById('edit-notes-title').textContent=task.title;
+  document.getElementById('edit-notes-text').value=task.notes||'';
+  setTimeout(()=>document.getElementById('edit-notes-text').focus(),50);
 }
 
-function openCompleteModal(id) {
-  completingId = id;
-  const task = tasks.find(t => t.id === id);
-  document.getElementById('complete-task-title').textContent = task.title;
-  document.getElementById('complete-notes').value = '';
+async function saveNotes(){
+  const task=tasks.find(t=>t.id===editingNotesId);if(!task)return;
+  const btn=document.getElementById('save-notes-btn');btn.disabled=true;btn.textContent='Saving…';
+  try{
+    await sbPatch('tasks',task.id,{notes:document.getElementById('edit-notes-text').value});
+    closeModal('notes-modal');await loadTasks();showToast('Notes saved','📝');
+  }catch(e){showToast('Error: '+e.message,'⚠️');}
+  finally{btn.disabled=false;btn.textContent='Save Notes';}
+}
+
+async function toggleFollowup(id){
+  const task=tasks.find(t=>t.id===id);if(!task)return;
+  const newVal=!task.followup;
+  try{
+    await sbPatch('tasks',task.id,{followup:newVal});
+    task.followup=newVal;updateStats();renderTasks();
+    showToast(newVal?'Moved to Follow-Up':'Back in To-Do',newVal?'🔔':'↩️');
+  }catch(e){showToast('Error: '+e.message,'⚠️');}
+}
+
+function openCompleteModal(id){
+  completingId=id;const task=tasks.find(t=>t.id===id);
+  document.getElementById('complete-task-title').textContent=task.title;
+  document.getElementById('complete-notes').value='';
   document.getElementById('complete-modal').classList.add('open');
-  setTimeout(() => document.getElementById('complete-notes').focus(), 50);
+  setTimeout(()=>document.getElementById('complete-notes').focus(),50);
 }
 
-async function confirmComplete() {
-  const task = tasks.find(t => t.id === completingId);
-  if (!task) return;
-  const btn = document.getElementById('confirm-btn');
-  btn.disabled = true; btn.textContent = 'Saving…';
-
-  try {
-    const completedBy = currentUser === 'Rolando' ? 'Rolando Ayala' : 'Ryan Mika';
-    const completionNotes = document.getElementById('complete-notes').value;
-    await sbPatch('tasks', task.id, {
-      completed: true,
-      assigned_to: null,       // falls off both To-Do and Ryan's Queue
-      completed_by: completedBy,
-      completion_notes: completionNotes
-    });
-    closeModal('complete-modal');
-    await loadTasks();
-    showToast('Complete — ' + completedBy, '✅');
-  } catch(e) {
-    showToast('Error: ' + e.message, '⚠️');
-  } finally {
-    btn.disabled = false; btn.textContent = '✓ Mark Complete';
-  }
+async function confirmComplete(){
+  const task=tasks.find(t=>t.id===completingId);if(!task)return;
+  const btn=document.getElementById('confirm-btn');btn.disabled=true;btn.textContent='Saving…';
+  try{
+    const completedBy=currentUser==='Rolando'?'Rolando Ayala':'Ryan Mika';
+    await sbPatch('tasks',task.id,{completed:true,assigned_to:null,followup:false,completed_by:completedBy,completion_notes:document.getElementById('complete-notes').value});
+    closeModal('complete-modal');await loadTasks();showToast('Completed by '+completedBy,'✅');
+  }catch(e){showToast('Error: '+e.message,'⚠️');}
+  finally{btn.disabled=false;btn.textContent='✓ Mark Complete';}
 }
 
-function toggleExpand(id) {
-  expandedId = expandedId === id ? null : id;
-  renderTasks();
+function updateStats(){
+  const total=tasks.length;
+  const complete=tasks.filter(t=>t.status==='complete').length;
+  const todo=tasks.filter(t=>t.status==='incomplete'&&!t.followup).length;
+  const followup=tasks.filter(t=>t.followup&&t.status==='incomplete').length;
+  const ryan=tasks.filter(t=>t.assignedTo==='Ryan'&&t.status==='incomplete'&&!t.followup).length;
+  document.getElementById('stat-total').textContent=total;
+  document.getElementById('stat-complete').textContent=complete;
+  document.getElementById('stat-todo').textContent=todo;
+  document.getElementById('stat-followup').textContent=followup;
+  document.getElementById('stat-ryan').textContent=ryan;
+  document.getElementById('badge-master').textContent=total;
+  document.getElementById('badge-todo').textContent=todo;
+  document.getElementById('badge-followup').textContent=followup;
+  document.getElementById('badge-ryan').textContent=ryan;
 }
 
-// ─── STATS ───────────────────────────────────────────────────
-function updateStats() {
-  const total = tasks.length;
-  const complete = tasks.filter(t => t.status === 'complete').length;
-  const todo = tasks.filter(t => t.status === 'incomplete').length;
-  const followup = tasks.filter(t => t.followup && t.status === 'incomplete').length;
-  const ryan = tasks.filter(t => t.assignedTo === 'Ryan' && t.status === 'incomplete').length;
-
-  document.getElementById('stat-total').textContent = total;
-  document.getElementById('stat-complete').textContent = complete;
-  document.getElementById('stat-todo').textContent = todo;
-  document.getElementById('stat-followup').textContent = followup;
-  document.getElementById('stat-ryan').textContent = ryan;
-
-  document.getElementById('badge-master').textContent = total;
-  document.getElementById('badge-todo').textContent = todo;
-  document.getElementById('badge-followup').textContent = followup;
-  document.getElementById('badge-ryan').textContent = ryan;
-}
-
-// ─── RENDER ──────────────────────────────────────────────────
-function getFilteredTasks() {
-  const q = (document.getElementById('search-input').value || '').toLowerCase();
-  let filtered = [...tasks];
-
-  if (currentTab === 'todo') {
-    filtered = tasks.filter(t => t.status === 'incomplete');
-  } else if (currentTab === 'followup') {
-    filtered = tasks.filter(t => t.followup && t.status === 'incomplete');
-  } else if (currentTab === 'ryan') {
-    filtered = tasks.filter(t => t.assignedTo === 'Ryan' && t.status === 'incomplete');
-  }
-
-  if (q) filtered = filtered.filter(t =>
-    t.title.toLowerCase().includes(q) ||
-    (t.notes && t.notes.toLowerCase().includes(q))
-  );
+function getFilteredTasks(){
+  const q=(document.getElementById('search-input').value||'').toLowerCase();
+  let filtered;
+  if(currentTab==='master')filtered=[...tasks];
+  else if(currentTab==='todo')filtered=tasks.filter(t=>t.status==='incomplete'&&!t.followup);
+  else if(currentTab==='followup')filtered=tasks.filter(t=>t.followup&&t.status==='incomplete');
+  else if(currentTab==='ryan')filtered=tasks.filter(t=>t.assignedTo==='Ryan'&&t.status==='incomplete'&&!t.followup);
+  if(q)filtered=filtered.filter(t=>t.title.toLowerCase().includes(q)||(t.notes&&t.notes.toLowerCase().includes(q)));
   return filtered;
 }
 
-const sectionMeta = {
-  Compliance:   { icon:'🔴', cls:'section-compliance' },
-  Maintenance:  { icon:'🔧', cls:'section-maintenance' },
-  Operations:   { icon:'⚙️', cls:'section-operations' },
-  Inspections:  { icon:'🔬', cls:'section-inspections' },
-  Admin:        { icon:'🗂️', cls:'section-admin' },
-};
+const sectionMeta={Compliance:{icon:'🔴',cls:'section-compliance'},Maintenance:{icon:'🔧',cls:'section-maintenance'},Operations:{icon:'⚙️',cls:'section-operations'},Inspections:{icon:'🔬',cls:'section-inspections'},Admin:{icon:'🗂️',cls:'section-admin'}};
 
-function renderTasks() {
-  const filtered = getFilteredTasks();
-  const container = document.getElementById('main-content');
-
-  if (currentTab === 'ryan') {
-    renderRyanTab(filtered, container);
-    return;
+function renderTasks(){
+  const filtered=getFilteredTasks();const container=document.getElementById('main-content');
+  if(currentTab==='ryan'){renderRyanTab(filtered,container);return;}
+  if(filtered.length===0){container.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div>No tasks</div>`;return;}
+  const groups={};filtered.forEach(t=>{if(!groups[t.section])groups[t.section]=[];groups[t.section].push(t);});
+  let html='';
+  for(const[section,items]of Object.entries(groups)){
+    const meta=sectionMeta[section]||{icon:'•',cls:''};
+    html+=`<div class="${meta.cls}"><div class="section-label">${meta.icon} ${section} — ${items.length}</div>`;
+    items.forEach(t=>{html+=renderCard(t);});html+=`</div>`;
   }
-
-  if (filtered.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div>No tasks</div>`;
-    return;
-  }
-
-  const groups = {};
-  filtered.forEach(t => {
-    if (!groups[t.section]) groups[t.section] = [];
-    groups[t.section].push(t);
-  });
-
-  let html = '';
-  for (const [section, items] of Object.entries(groups)) {
-    const meta = sectionMeta[section] || { icon:'•', cls:'' };
-    html += `<div class="${meta.cls}">`;
-    html += `<div class="section-label">${meta.icon} ${section} — ${items.length}</div>`;
-    items.forEach(t => { html += renderCard(t); });
-    html += `</div>`;
-  }
-  container.innerHTML = html;
+  container.innerHTML=html;
 }
 
-function renderRyanTab(filtered, container) {
-  let html = `<div class="ryan-header">
-    <div class="ryan-avatar">RM</div>
-    <div class="ryan-info">
-      <h3>Ryan Mika</h3>
-      <p>${filtered.length} task${filtered.length!==1?'s':''} in queue</p>
-    </div>
-  </div>`;
-  if (filtered.length === 0) {
-    html += `<div class="empty-state"><div class="empty-icon">✅</div>Queue is clear</div>`;
-  } else {
-    filtered.forEach(t => { html += renderCard(t, true); });
-  }
-  container.innerHTML = html;
+function renderRyanTab(filtered,container){
+  let html=`<div class="ryan-header"><div class="ryan-avatar">RM</div><div class="ryan-info"><h3>Ryan Mika</h3><p>${filtered.length} task${filtered.length!==1?'s':''} in queue</p></div></div>`;
+  if(filtered.length===0)html+=`<div class="empty-state"><div class="empty-icon">✅</div>Queue is clear</div>`;
+  else filtered.forEach(t=>{html+=renderCard(t,true);});
+  container.innerHTML=html;
 }
 
-function renderCard(t, isRyanView = false) {
-  const isDone = t.status === 'complete';
-  const isExpanded = expandedId === t.id;
-  const alreadyPushed = t.assignedTo === 'Ryan';
-
-  let actions = '';
-  if (currentTab === 'todo' && !isDone && !alreadyPushed) {
-    actions += `<button class="btn btn-ryan" style="font-size:11px;padding:4px 8px" onclick="event.stopPropagation();pushToRyan(${t.id})">📤 Ryan</button>`;
-  }
-  if (currentTab === 'todo' && !isDone && alreadyPushed) {
-    actions += `<span style="font-size:10px;color:var(--blue);padding:2px 6px;white-space:nowrap">→ Ryan</span>`;
-  }
-  if (isRyanView && !isDone) {
-    actions += `<button class="btn btn-complete" onclick="event.stopPropagation();openCompleteModal(${t.id})">✓ Done</button>`;
-  }
-
-  const attachIcons = (t.attachments || []).map(a => {
-    const ext = (a.split('.').pop() || '').toLowerCase();
-    const icon = ext === 'pdf' ? '📄' : ['jpg','jpeg','png'].includes(ext) ? '🖼️' : ext === 'xlsx' ? '📊' : '📎';
-    return `<div class="attach-item">${icon} ${a}</div>`;
-  }).join('');
+function renderCard(t,isRyanView=false){
+  const isDone=t.status==='complete';const isExpanded=expandedId===t.id;const alreadyPushed=t.assignedTo==='Ryan';
+  let topAction='';
+  if(!isDone&&!t.followup&&(currentTab==='todo'||currentTab==='master')&&!alreadyPushed)
+    topAction=`<button class="btn btn-ryan" style="font-size:11px;padding:4px 8px" onclick="event.stopPropagation();pushToRyan(${t.id})">📤 Ryan</button>`;
+  if(!isDone&&!t.followup&&currentTab==='todo'&&alreadyPushed)
+    topAction=`<span style="font-size:10px;color:var(--blue);padding:2px 6px;white-space:nowrap">→ Ryan</span>`;
+  if(isRyanView&&!isDone)
+    topAction=`<button class="btn btn-complete" style="font-size:11px;padding:4px 6px" onclick="event.stopPropagation();openCompleteModal(${t.id})">✓ Done</button>`;
 
   return `
-    <div class="task-card ${isDone?'completed':''} ${alreadyPushed?'ryan-assigned':''}" id="card-${t.id}">
+    <div class="task-card ${isDone?'is-complete':''} ${alreadyPushed&&!t.followup?'ryan-assigned':''}" id="card-${t.id}">
       <div class="task-main" onclick="toggleExpand(${t.id})">
         <div class="task-check ${isDone?'done':''}">${isDone?'✓':''}</div>
         <div class="task-body">
-          <div class="task-title ${isDone?'done':''}">${t.title}</div>
+          <div class="task-title">${t.title}</div>
           <div class="task-meta">
             <span class="tag tag-section">${t.section}</span>
             <span class="tag-date">${t.date}</span>
-            ${t.followup ? '<span class="tag tag-followup">Follow-Up</span>' : ''}
-            ${alreadyPushed ? '<span class="tag tag-ryan">→ Ryan</span>' : ''}
-            ${isDone && t.completedBy ? `<span class="tag tag-completedby">✓ ${t.completedBy}</span>` : ''}
-            ${(t.attachments||[]).length > 0 ? `<span class="tag" style="background:rgba(232,160,32,0.1);border:1px solid rgba(232,160,32,0.2);color:var(--accent)">📎 ${t.attachments.length}</span>` : ''}
+            ${t.followup?'<span class="tag tag-followup">🔔 Follow-Up</span>':''}
+            ${alreadyPushed&&!t.followup?'<span class="tag tag-ryan">→ Ryan</span>':''}
+            ${isDone?`<span class="tag tag-completedby">✓ ${t.completedBy}</span>`:''}
           </div>
         </div>
-        <div class="task-actions">${actions}</div>
+        <div class="task-actions">${topAction}</div>
       </div>
-
       <div class="task-expanded ${isExpanded?'open':''}">
         <div class="expand-row">
           <div class="expand-col">
             <div class="expand-label">Notes</div>
-            <div class="expand-text">${t.notes || '<span style="color:var(--text3)">None</span>'}</div>
+            <div class="expand-text">${t.notes||'<span style="color:var(--text3)">No notes — tap Edit Notes to add</span>'}</div>
           </div>
-          ${isDone && t.completedNotes ? `
-          <div class="expand-col">
-            <div class="expand-label" style="color:#5dade2">Completion Notes</div>
-            <div class="expand-text" style="color:#5dade2">${t.completedNotes}</div>
-          </div>` : ''}
+          ${isDone&&t.completedNotes?`<div class="expand-col"><div class="expand-label" style="color:var(--green)">Completion Notes</div><div class="expand-text" style="color:#5dade2">${t.completedNotes}</div></div>`:''}
         </div>
-
-        <div class="attachments">
-          <div class="expand-label">Attachments</div>
-          <div class="attach-list">
-            ${attachIcons}
-            <div class="attach-upload">+ Attach file <span style="font-size:9px;color:var(--text3)">(coming soon)</span></div>
-          </div>
-        </div>
-
-        <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
-          ${!isDone ? `<button class="btn btn-complete" style="font-size:12px;padding:6px 12px" onclick="openCompleteModal(${t.id})">✓ Mark Complete</button>` : ''}
-          ${!isDone && (currentTab==='todo'||currentTab==='master') && !alreadyPushed ? `<button class="btn btn-ryan" onclick="pushToRyan(${t.id})">📤 Push to Ryan</button>` : ''}
+        <div class="expand-actions">
+          <button class="btn" style="font-size:11px;padding:4px 8px" onclick="openNotesModal(${t.id})">📝 Edit Notes</button>
+          ${!isDone?`<button class="btn btn-followup ${t.followup?'flagged':''}" style="font-size:11px;padding:4px 8px" onclick="toggleFollowup(${t.id})">${t.followup?'🔔 Remove Follow-Up':'🔔 Flag Follow-Up'}</button>`:''}
+          ${!isDone&&!alreadyPushed&&!t.followup&&(currentTab==='todo'||currentTab==='master')?`<button class="btn btn-ryan" style="font-size:11px;padding:4px 8px" onclick="pushToRyan(${t.id})">📤 Push to Ryan</button>`:''}
+          ${!isDone?`<button class="btn btn-complete" style="font-size:12px;padding:6px 12px" onclick="openCompleteModal(${t.id})">✓ Mark Complete</button>`:''}
         </div>
       </div>
     </div>`;
 }
 
-// ─── INIT ────────────────────────────────────────────────────
-document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
-});
-
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
 loadTasks();
 </script>
 </body>
