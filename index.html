@@ -553,7 +553,7 @@ function renderCard(t,isRyanView=false){
           ${!isDone?`<button class="btn btn-followup ${t.followup?'flagged':''}" style="font-size:11px;padding:4px 8px" onclick="toggleFollowup(${t.id})">${t.followup?'🔔 Remove Follow-Up':'🔔 Flag Follow-Up'}</button>`:''}
           ${!isDone&&!alreadyPushed&&!t.followup&&(currentTab==='todo'||currentTab==='master')?`<button class="btn btn-ryan" style="font-size:11px;padding:4px 8px" onclick="pushToRyan(${t.id})">📤 Push to Ryan</button>`:''}
           ${!isDone&&currentTab!=='master'?`<button class="btn btn-complete" style="font-size:12px;padding:6px 12px" onclick="openCompleteModal(${t.id})">✓ Mark Complete</button>`:''}
-          ${isDone&&currentTab==='master'?`<button class="btn btn-undo" style="font-size:12px;padding:6px 12px" onclick="openUndoModal(${t.id})">↩ Undo Complete</button>`:''}
+          ${isDone&&currentTab==='master'?`<button class="btn" style="font-size:12px;padding:6px 12px;background:rgba(231,76,60,.15);color:var(--red);border-color:rgba(231,76,60,.3);" onclick="openUndoModal(${t.id})">↩ Back to To-Do</button>`:''}
         </div>
       </div>
     </div>`;
