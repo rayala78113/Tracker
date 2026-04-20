@@ -552,8 +552,8 @@ function renderCard(t,isRyanView=false){
           <button class="btn" style="font-size:11px;padding:4px 8px" onclick="openNotesModal(${t.id})">📝 Edit Notes</button>
           ${!isDone?`<button class="btn btn-followup ${t.followup?'flagged':''}" style="font-size:11px;padding:4px 8px" onclick="toggleFollowup(${t.id})">${t.followup?'🔔 Remove Follow-Up':'🔔 Flag Follow-Up'}</button>`:''}
           ${!isDone&&!alreadyPushed&&!t.followup&&(currentTab==='todo'||currentTab==='master')?`<button class="btn btn-ryan" style="font-size:11px;padding:4px 8px" onclick="pushToRyan(${t.id})">📤 Push to Ryan</button>`:''}
-          ${!isDone?`<button class="btn btn-complete" style="font-size:12px;padding:6px 12px" onclick="openCompleteModal(${t.id})">✓ Mark Complete</button>`:''}
-          ${isDone?`<button class="btn btn-undo" onclick="openUndoModal(${t.id})">↩ Undo Complete</button>`:''}
+          ${!isDone&&currentTab!=='master'?`<button class="btn btn-complete" style="font-size:12px;padding:6px 12px" onclick="openCompleteModal(${t.id})">✓ Mark Complete</button>`:''}
+          ${isDone&&currentTab==='master'?`<button class="btn btn-undo" style="font-size:12px;padding:6px 12px" onclick="openUndoModal(${t.id})">↩ Undo Complete</button>`:''}
         </div>
       </div>
     </div>`;
