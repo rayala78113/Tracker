@@ -315,6 +315,40 @@
   </div>
 </div>
 
+<!-- EDIT TASK MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-title">— Edit Task</div>
+    <div class="modal-field"><div class="modal-label">Task Title</div><input class="form-input" id="edit-title" placeholder="Describe the task…"></div>
+    <div class="modal-field"><div class="modal-label">Section</div>
+      <select class="form-input" id="edit-section">
+        <option value="Compliance">🔴 Compliance / Regulatory</option>
+        <option value="Maintenance">🔧 Maintenance / Equipment</option>
+        <option value="Operations">⚙️ Operations / Process</option>
+        <option value="Inspections">🔬 Inspections / Integrity</option>
+        <option value="Admin">🗂️ Admin / IT / Vendors</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('edit-modal')">Cancel</button>
+      <button class="btn btn-primary" id="edit-btn" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE TASK MODAL -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal">
+    <div class="modal-title" style="color:var(--red)">— Delete Task</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.4" id="delete-task-title"></div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">This task will be permanently deleted. This cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('delete-modal')">Cancel</button>
+      <button class="btn" style="font-size:13px;padding:7px 14px;background:rgba(231,76,60,.2);color:var(--red);border-color:rgba(231,76,60,.4)" id="confirm-delete-btn" onclick="confirmDelete()">🗑️ Delete Task</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>
 
 <script>
@@ -515,6 +549,52 @@ async function confirmUndo(){
   finally{btn.disabled=false;btn.textContent='↩ Undo Complete';}
 }
 
+// ─── EDIT TASK ────────────────────────────────────────────────
+let editingTaskId=null;
+
+function openEditModal(id){
+  editingTaskId=id;const task=tasks.find(t=>t.id===id);
+  document.getElementById('edit-modal').classList.add('open');
+  document.getElementById('edit-title').value=task.title;
+  document.getElementById('edit-section').value=task.section;
+  setTimeout(()=>document.getElementById('edit-title').focus(),50);
+}
+
+async function saveEdit(){
+  const task=tasks.find(t=>t.id===editingTaskId);if(!task)return;
+  const newTitle=document.getElementById('edit-title').value.trim();
+  if(!newTitle){showToast('Title required','⚠️');return;}
+  const btn=document.getElementById('edit-btn');btn.disabled=true;btn.textContent='Saving…';
+  try{
+    await sbPatch('tasks',task.id,{
+      text:newTitle,
+      section:document.getElementById('edit-section').value
+    });
+    closeModal('edit-modal');await loadTasks();showToast('Task updated','✏️');
+  }catch(e){showToast('Error: '+e.message,'⚠️');}
+  finally{btn.disabled=false;btn.textContent='Save Changes';}
+}
+
+// ─── DELETE TASK ──────────────────────────────────────────────
+let deletingTaskId=null;
+
+function openDeleteModal(id){
+  deletingTaskId=id;const task=tasks.find(t=>t.id===id);
+  document.getElementById('delete-task-title').textContent=task.title;
+  document.getElementById('delete-modal').classList.add('open');
+}
+
+async function confirmDelete(){
+  const task=tasks.find(t=>t.id===deletingTaskId);if(!task)return;
+  const btn=document.getElementById('confirm-delete-btn');btn.disabled=true;btn.textContent='Deleting…';
+  try{
+    const response=await fetch(`${SUPABASE_URL}/rest/v1/tasks?id=eq.${task.id}`,{method:'DELETE',headers:H});
+    if(!response.ok)throw new Error(await response.text());
+    closeModal('delete-modal');await loadTasks();showToast('Task deleted','🗑️');
+  }catch(e){showToast('Error: '+e.message,'⚠️');}
+  finally{btn.disabled=false;btn.textContent='🗑️ Delete Task';}
+}
+
 // ─── STATS ────────────────────────────────────────────────────
 function updateStats(){
   const total=tasks.length;
@@ -623,11 +703,13 @@ function renderCard(t,isRyanView=false){
           ${isDone&&t.completedNotes?`<div class="expand-col"><div class="expand-label" style="color:var(--green)">Completion Notes</div><div class="expand-text" style="color:#5dade2">${t.completedNotes}</div></div>`:''}
         </div>
         <div class="expand-actions">
+          <button class="btn" style="font-size:11px;padding:4px 8px" onclick="openEditModal(${t.id})">✏️ Edit Task</button>
           <button class="btn" style="font-size:11px;padding:4px 8px" onclick="openNotesModal(${t.id})">📝 Edit Notes</button>
           ${!isDone?`<button class="btn btn-followup ${t.followup?'flagged':''}" style="font-size:11px;padding:4px 8px" onclick="toggleFollowup(${t.id})">${t.followup?'🔔 Remove Follow-Up':'🔔 Flag Follow-Up'}</button>`:''}
           ${!isDone&&!alreadyPushed&&!t.followup&&(currentTab==='todo'||currentTab==='master')?`<button class="btn btn-ryan" style="font-size:11px;padding:4px 8px" onclick="pushToRyan(${t.id})">📤 Push to Ryan</button>`:''}
           ${!isDone&&currentTab!=='master'?`<button class="btn btn-complete" style="font-size:12px;padding:6px 12px" onclick="openCompleteModal(${t.id})">✓ Mark Complete</button>`:''}
           ${isDone&&currentTab==='master'?`<button class="btn" style="font-size:12px;padding:6px 12px;background:rgba(231,76,60,.15);color:var(--red);border-color:rgba(231,76,60,.3);" onclick="openUndoModal(${t.id})">↩ Back to To-Do</button>`:''}
+          <button class="btn" style="font-size:11px;padding:4px 8px;background:rgba(231,76,60,.1);color:var(--red);border-color:rgba(231,76,60,.3);margin-left:auto" onclick="openDeleteModal(${t.id})">🗑️ Delete</button>
         </div>
       </div>
     </div>`;
