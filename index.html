@@ -83,7 +83,7 @@
     .stat-label{font-size:9px;}
     .tabs{padding:0 8px;}
     .tab{padding:10px 10px;font-size:12px;}
-    .toolbar{padding:10px 16px;}
+    .toolbar{padding:10px 16px;flex-wrap:wrap;}
     .content{padding:14px 16px;}
     .header{padding:0 16px;height:52px;}
   }
@@ -143,8 +143,9 @@
   .form-input:focus{border-color:var(--accent);}
   .form-input::placeholder{color:var(--text3);}
   select.form-input{cursor:pointer;}
-  textarea.form-input{resize:vertical;}
+  textarea.form-input{resize:vertical;font-family:'IBM Plex Mono',monospace;}
   .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+  .bulk-preview{font-size:11px;color:var(--text3);padding:8px 0;}
 
   /* RYAN HEADER */
   .ryan-header{background:linear-gradient(135deg,rgba(52,152,219,.08),rgba(52,152,219,.03));border:1px solid rgba(52,152,219,.2);border-radius:8px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
@@ -194,6 +195,7 @@
 <div class="toolbar">
   <input class="search" type="text" placeholder="Search tasks…" oninput="renderTasks()" id="search-input">
   <button class="btn btn-primary" onclick="openAddModal()">+ Add Task</button>
+  <button class="btn" onclick="openBulkModal()">📝 Bulk Add</button>
 </div>
 
 <!-- PAGE LAYOUT -->
@@ -249,6 +251,27 @@
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('add-modal')">Cancel</button>
       <button class="btn btn-primary" id="add-btn" onclick="addTask()">Add Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- BULK IMPORT MODAL -->
+<div class="modal-overlay" id="bulk-modal">
+  <div class="modal">
+    <div class="modal-title">— Bulk Add Tasks</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5">
+      Paste your daily notes below — each line becomes one task in your To-Do list
+    </div>
+    <div class="modal-field">
+      <textarea class="form-input" id="bulk-text" placeholder="* Table Top ERP Drill — schedule for 2026
+* FCT LACTs — ensure all valves have locks
+* Update FCT signage at LACTs — add cameras
+* FCT flare conduit needs to be redone" style="height:260px" oninput="updateBulkPreview()"></textarea>
+    </div>
+    <div class="bulk-preview"><span id="bulk-count">0</span> tasks will be imported</div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('bulk-modal')">Cancel</button>
+      <button class="btn btn-primary" id="bulk-btn" onclick="bulkImport()">Import Tasks</button>
     </div>
   </div>
 </div>
@@ -335,9 +358,60 @@ async function addTask(){
   const btn=document.getElementById('add-btn');btn.disabled=true;btn.textContent='Saving…';
   try{
     await sbPost('tasks',{text:title,section:document.getElementById('new-section').value,completed:false,followup:false,notes:document.getElementById('new-notes').value,date_added:new Date().toISOString(),assigned_to:null,completed_by:null,completion_notes:'',attachments:[]});
-    closeModal('add-modal');await loadTasks();showToast('Task added to Master','📋');
+    closeModal('add-modal');await loadTasks();showToast('Task added to To-Do','📋');
   }catch(e){showToast('Error: '+e.message,'⚠️');}
   finally{btn.disabled=false;btn.textContent='Add Task';}
+}
+
+// ─── BULK IMPORT ──────────────────────────────────────────────
+function openBulkModal(){
+  document.getElementById('bulk-modal').classList.add('open');
+  document.getElementById('bulk-text').value='';
+  document.getElementById('bulk-count').textContent='0';
+  setTimeout(()=>document.getElementById('bulk-text').focus(),50);
+}
+
+function updateBulkPreview(){
+  const text=document.getElementById('bulk-text').value;
+  const lines=text.split('\n')
+    .map(l=>l.trim())
+    .filter(l=>l.length>0&&!l.toLowerCase().match(/^page\s+\d+/));
+  document.getElementById('bulk-count').textContent=lines.length;
+}
+
+async function bulkImport(){
+  const text=document.getElementById('bulk-text').value.trim();
+  if(!text){showToast('Paste your notes first','⚠️');return;}
+  
+  const lines=text.split('\n')
+    .map(l=>l.trim())
+    .filter(l=>l.length>0&&!l.toLowerCase().match(/^page\s+\d+/));
+  
+  if(lines.length===0){showToast('No tasks found','⚠️');return;}
+  
+  const tasks=lines.map(line=>{
+    const cleaned=line.replace(/^[*\-•]\s*/,'').replace(/^\d+\.\s*/,'').trim();
+    return {
+      text:cleaned,
+      section:'Admin',
+      completed:false,
+      followup:false,
+      notes:'',
+      date_added:new Date().toISOString(),
+      assigned_to:null,
+      completed_by:null,
+      completion_notes:'',
+      attachments:[]
+    };
+  });
+  
+  const btn=document.getElementById('bulk-btn');btn.disabled=true;btn.textContent='Importing…';
+  try{
+    await sbPost('tasks',tasks);
+    closeModal('bulk-modal');await loadTasks();
+    showToast(`${tasks.length} tasks added to To-Do`,'📋');
+  }catch(e){showToast('Error: '+e.message,'⚠️');}
+  finally{btn.disabled=false;btn.textContent='Import Tasks';}
 }
 
 function switchTab(tab){
