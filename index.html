@@ -15,51 +15,30 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
-
   .header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
   .logo{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;letter-spacing:.08em;color:var(--accent);}
   .logo-icon{width:28px;height:28px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#000;font-weight:700;}
-  .user-badge{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 12px;font-size:12px;color:var(--text2);cursor:pointer;}
-
   .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;overflow-x:auto;scrollbar-width:none;}
   .tabs::-webkit-scrollbar{display:none;}
   .tab{padding:12px 16px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;display:flex;align-items:center;gap:6px;margin-bottom:-1px;white-space:nowrap;flex-shrink:0;}
   .tab:hover{color:var(--text2);}
   .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
   .tab-badge{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1px 7px;font-size:10px;font-family:'IBM Plex Mono',monospace;}
-
   .stats-bar{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);}
   .stat{flex:1;background:var(--surface);padding:12px 16px;cursor:pointer;transition:background .15s;}
   .stat:hover{background:var(--surface2);}
   .stat-num{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;line-height:1;}
   .stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
-
   .toolbar{padding:12px 24px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap;}
   .search-wrapper{flex:1;min-width:200px;}
   .search{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 14px;color:var(--text);font-size:13px;outline:none;}
   .search::placeholder{color:var(--text3);}
   .search:focus{border-color:var(--border2);}
-
   .btn{padding:7px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:all .15s;font-family:'IBM Plex Sans',sans-serif;white-space:nowrap;}
   .btn:hover{border-color:var(--border2);color:var(--text);}
-  .btn:disabled{opacity:.4;cursor:not-allowed;}
   .btn-primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600;}
   .btn-primary:hover{background:var(--accent2);color:#000;}
-
-  .page-layout{display:flex;min-height:calc(100vh - 160px);}
-  .sidebar{width:280px;flex-shrink:0;border-right:1px solid var(--border);padding:20px 16px;display:none;}
-  .main-content-wrap{flex:1;min-width:0;}
   .content{padding:20px 24px;}
-
-  @media(min-width:900px){
-    .sidebar{display:block;}
-  }
-  @media(max-width:899px){
-    .toolbar{padding:10px 16px;}
-    .content{padding:14px 16px;}
-    .header{padding:0 16px;height:52px;}
-  }
-
   .task-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;padding:12px 14px;cursor:pointer;transition:all .15s;}
   .task-card:hover{border-color:var(--border2);background:var(--surface2);}
   .task-card.is-complete{border-left:3px solid var(--green)!important;}
@@ -70,9 +49,6 @@
   .task-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;line-height:1.4;word-break:break-word;}
   .task-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
   .tag{font-size:10px;padding:2px 6px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-weight:500;background:var(--surface2);border:1px solid var(--border);color:var(--text3);}
-  .tag-priority{background:rgba(230,126,34,.15);border-color:rgba(230,126,34,.3);color:var(--orange);}
-  .tag-priority.high{background:rgba(231,76,60,.15);border-color:rgba(231,76,60,.3);color:var(--red);}
-
   .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;}
   .modal-overlay.open{display:flex;}
   .modal{background:var(--surface);border:1px solid var(--border);border-radius:8px;width:90%;max-width:600px;max-height:90vh;overflow-y:auto;padding:20px;}
@@ -80,25 +56,13 @@
   .modal-header h2{font-size:16px;}
   .modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;}
   .modal-close:hover{color:var(--text);}
-
   .form-group{margin-bottom:16px;}
   .form-label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
   .form-input,.form-textarea,.form-select{width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:'IBM Plex Sans',sans-serif;}
   .form-textarea{resize:vertical;min-height:80px;}
   .form-input:focus,.form-textarea:focus,.form-select:focus{outline:none;border-color:var(--accent);}
-
-  .checkbox-group{display:flex;gap:12px;flex-wrap:wrap;}
-  .checkbox-item{display:flex;align-items:center;gap:6px;cursor:pointer;}
-  .checkbox-item input[type="checkbox"]{cursor:pointer;}
-
   .empty-state{text-align:center;padding:40px 20px;color:var(--text3);}
-  .empty-icon{font-size:48px;margin-bottom:12px;}
-
-  @media(max-width:599px){
-    .modal{width:95%;max-height:95vh;}
-    .toolbar{flex-direction:column;gap:12px;}
-    .search-wrapper{min-width:100%;}
-  }
+  @media(max-width:599px){.modal{width:95%;max-height:95vh;}.toolbar{flex-direction:column;gap:12px;}.search-wrapper{min-width:100%;}}
 </style>
 </head>
 <body>
@@ -108,31 +72,31 @@
     <div class="logo-icon">📋</div>
     <span>TSAR TRACKER v2</span>
   </div>
-  <div class="user-badge" id="userBadge">👤 Rolando Ayala</div>
+  <div style="color:var(--text2);font-size:12px;">👤 Rolando Ayala</div>
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="switchTab('master')">Master <span class="tab-badge" id="badge-master">0</span></button>
-  <button class="tab" onclick="switchTab('todo')">To-Do <span class="tab-badge" id="badge-todo">0</span></button>
-  <button class="tab" onclick="switchTab('followup')">Follow-Up <span class="tab-badge" id="badge-followup">0</span></button>
-  <button class="tab" onclick="switchTab('ryan')">Ryan <span class="tab-badge" id="badge-ryan">0</span></button>
-  <button class="tab" onclick="switchTab('overdue')">⚠️ Overdue <span class="tab-badge" id="badge-overdue">0</span></button>
+  <button class="tab active" onclick="window.switchTab('master')">Master <span class="tab-badge" id="badge-master">0</span></button>
+  <button class="tab" onclick="window.switchTab('todo')">To-Do <span class="tab-badge" id="badge-todo">0</span></button>
+  <button class="tab" onclick="window.switchTab('followup')">Follow-Up <span class="tab-badge" id="badge-followup">0</span></button>
+  <button class="tab" onclick="window.switchTab('ryan')">Ryan <span class="tab-badge" id="badge-ryan">0</span></button>
+  <button class="tab" onclick="window.switchTab('overdue')">⚠️ Overdue <span class="tab-badge" id="badge-overdue">0</span></button>
 </div>
 
 <div class="stats-bar">
-  <div class="stat" onclick="switchTab('master')">
+  <div class="stat" onclick="window.switchTab('master')">
     <div class="stat-num" id="stat-total">0</div>
     <div class="stat-label">Total</div>
   </div>
-  <div class="stat" onclick="switchTab('todo')">
+  <div class="stat" onclick="window.switchTab('todo')">
     <div class="stat-num" id="stat-todo">0</div>
     <div class="stat-label">To-Do</div>
   </div>
-  <div class="stat" onclick="switchTab('followup')">
+  <div class="stat" onclick="window.switchTab('followup')">
     <div class="stat-num" id="stat-followup">0</div>
     <div class="stat-label">Follow-Up</div>
   </div>
-  <div class="stat" onclick="switchTab('overdue')">
+  <div class="stat" onclick="window.switchTab('overdue')">
     <div class="stat-num" id="stat-overdue">0</div>
     <div class="stat-label">Overdue</div>
   </div>
@@ -140,30 +104,25 @@
 
 <div class="toolbar">
   <div class="search-wrapper">
-    <input type="text" class="search" id="search-input" placeholder="Search tasks by title, notes, section..." onkeyup="doSearch()">
+    <input type="text" class="search" id="search-input" placeholder="Search tasks..." onkeyup="window.doSearch()">
   </div>
-  <button class="btn btn-primary" onclick="openNewTaskModal()">+ New Task</button>
-  <button class="btn" onclick="exportCSV()">📥 CSV</button>
-  <button class="btn" onclick="exportExcel()">📥 Excel</button>
+  <button class="btn btn-primary" onclick="window.openNewTaskModal()">+ New Task</button>
+  <button class="btn" onclick="window.exportCSV()">📥 CSV</button>
+  <button class="btn" onclick="window.exportExcel()">📥 Excel</button>
   <button class="btn" onclick="document.getElementById('importFile').click()">📤 Import</button>
-  <input type="file" id="importFile" style="display:none" accept=".csv,.xlsx" onchange="importFile(event)">
+  <input type="file" id="importFile" style="display:none" accept=".csv,.xlsx" onchange="window.importFile(event)">
 </div>
 
-<div class="page-layout">
-  <div class="sidebar" id="sidebar"></div>
-  <div class="main-content-wrap">
-    <div class="content" id="main-content"></div>
-  </div>
-</div>
+<div class="content" id="main-content"></div>
 
 <!-- Edit Task Modal -->
-<div class="modal-overlay" id="editModal" onclick="if(event.target===this)closeModal('editModal')">
+<div class="modal-overlay" id="editModal" onclick="if(event.target===this)window.closeModal('editModal')">
   <div class="modal">
     <div class="modal-header">
       <h2>Edit Task</h2>
-      <button class="modal-close" onclick="closeModal('editModal')">×</button>
+      <button class="modal-close" onclick="window.closeModal('editModal')">×</button>
     </div>
-    <form onsubmit="saveTask(event)" id="taskForm">
+    <form onsubmit="window.saveTask(event)" id="taskForm">
       <div class="form-group">
         <label class="form-label">Title</label>
         <input type="text" id="taskTitle" class="form-input" required>
@@ -183,18 +142,16 @@
         <select id="taskStatus" class="form-select">
           <option value="incomplete">Incomplete</option>
           <option value="complete">Complete</option>
-          <option value="on-hold">On Hold</option>
-          <option value="blocked">Blocked</option>
         </select>
       </div>
       <div style="display:flex;gap:12px;margin-bottom:16px;">
         <div style="flex:1;">
           <label class="form-label">Assigned To</label>
-          <input type="text" id="taskAssignedTo" class="form-input" placeholder="Ryan, Rol, etc.">
+          <input type="text" id="taskAssignedTo" class="form-input">
         </div>
         <div style="flex:1;">
           <label class="form-label">Owner</label>
-          <input type="text" id="taskOwner" class="form-input" placeholder="Owner name">
+          <input type="text" id="taskOwner" class="form-input">
         </div>
       </div>
       <div style="display:flex;gap:12px;margin-bottom:16px;">
@@ -213,66 +170,18 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Tags (comma-separated)</label>
-        <input type="text" id="taskTags" class="form-input" placeholder="PHMSA, MOC, SCADA...">
-      </div>
-      <div class="form-group">
         <label class="form-label">Notes</label>
         <textarea id="taskNotes" class="form-textarea"></textarea>
       </div>
       <div class="form-group">
-        <label class="form-label">Completion Notes</label>
-        <textarea id="taskCompletionNotes" class="form-textarea"></textarea>
-      </div>
-      <div class="checkbox-group">
-        <label class="checkbox-item">
-          <input type="checkbox" id="taskFollowup">
-          <span>Flag for Follow-Up</span>
-        </label>
-        <label class="checkbox-item">
-          <input type="checkbox" id="taskRecurring" onchange="document.getElementById('recurringOptions').style.display=this.checked?'block':'none'">
-          <span>Recurring</span>
-        </label>
-      </div>
-      <div id="recurringOptions" style="display:none;margin-top:16px;padding:12px;background:var(--surface2);border-radius:6px;">
-        <div style="display:flex;gap:12px;">
-          <div style="flex:1;">
-            <label class="form-label">Recurring Type</label>
-            <select id="taskRecurringType" class="form-select">
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
-            </select>
-          </div>
-          <div style="flex:1;">
-            <label class="form-label">Interval (days)</label>
-            <input type="number" id="taskRecurringInterval" class="form-input" value="1">
-          </div>
-        </div>
+        <label><input type="checkbox" id="taskFollowup"> Flag for Follow-Up</label>
       </div>
       <div style="display:flex;gap:8px;margin-top:20px;">
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <button type="button" class="btn" onclick="closeModal('editModal')">Cancel</button>
-        <button type="button" class="btn" style="margin-left:auto;background:rgba(231,76,60,.15);color:var(--red);border-color:rgba(231,76,60,.3);" onclick="deleteTask()">Delete</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn" onclick="window.closeModal('editModal')">Cancel</button>
+        <button type="button" class="btn" style="margin-left:auto;background:rgba(231,76,60,.15);color:var(--red);" onclick="window.deleteTask()">Delete</button>
       </div>
     </form>
-  </div>
-</div>
-
-<!-- Duplicate Detection Modal -->
-<div class="modal-overlay" id="duplicateModal" onclick="if(event.target===this)closeDuplicateCheck()">
-  <div class="modal">
-    <div class="modal-header">
-      <h2>⚠️ Possible Duplicates Detected</h2>
-      <button class="modal-close" onclick="closeDuplicateCheck()">×</button>
-    </div>
-    <p style="color:var(--text2);margin-bottom:16px;">We found tasks that might be similar:</p>
-    <div id="duplicateList" style="max-height:300px;overflow-y:auto;margin-bottom:16px;"></div>
-    <div style="display:flex;gap:8px;">
-      <button class="btn btn-primary" onclick="saveTaskAnyway()">Create Anyway</button>
-      <button class="btn" onclick="closeDuplicateCheck()">Review Task</button>
-    </div>
   </div>
 </div>
 
@@ -280,24 +189,21 @@
 <script>
 const SUPABASE_URL = 'https://jbnufforfpgawnawgujv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpibnVmZm9yZnBnYXduYXdndWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNzk4ODEsImV4cCI6MjA5MTg1NTg4MX0.Zy4dcmb99FsMUDKMxn2ASsQ2ZmGO0aeCumO21jD8EBY';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let tasks = [];
 let currentTab = 'master';
-let currentUser = 'Rolando Ayala';
 let editingTaskId = null;
-let searchResults = [];
-let isSearching = false;
 
-async function loadTasks() {
-  const { data, error } = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
+window.loadTasks = async () => {
+  const { data, error } = await db.from('tasks').select('*').order('created_at', { ascending: false });
   if (error) { console.error(error); return; }
   tasks = data || [];
-  updateStats();
-  render();
-}
+  window.updateStats();
+  window.render();
+};
 
-function updateStats() {
+window.updateStats = () => {
   const total = tasks.length;
   const complete = tasks.filter(t => t.completed).length;
   const todo = tasks.filter(t => !t.completed && !t.followup).length;
@@ -308,65 +214,38 @@ function updateStats() {
   document.getElementById('stat-todo').textContent = todo;
   document.getElementById('stat-followup').textContent = followup;
   document.getElementById('stat-overdue').textContent = overdue;
-  
   document.getElementById('badge-master').textContent = total;
   document.getElementById('badge-todo').textContent = todo;
   document.getElementById('badge-followup').textContent = followup;
   document.getElementById('badge-overdue').textContent = overdue;
   document.getElementById('badge-ryan').textContent = tasks.filter(t => t.assigned_to === 'Ryan' && !t.completed && !t.followup).length;
-}
+};
 
-function getFilteredTasks() {
-  let filtered = [];
-  
-  if (isSearching && searchResults.length > 0) {
-    filtered = searchResults;
-  } else if (currentTab === 'master') {
-    filtered = [...tasks];
-  } else if (currentTab === 'todo') {
-    filtered = tasks.filter(t => !t.completed && !t.followup);
-  } else if (currentTab === 'followup') {
-    filtered = tasks.filter(t => t.followup && !t.completed);
-  } else if (currentTab === 'ryan') {
-    filtered = tasks.filter(t => t.assigned_to === 'Ryan' && !t.completed && !t.followup);
-  } else if (currentTab === 'overdue') {
-    filtered = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) < new Date());
-  }
-  
-  return filtered;
-}
-
-function doSearch() {
-  const query = document.getElementById('search-input').value;
-  if (!query) {
-    isSearching = false;
-    render();
-    return;
-  }
-  
-  const fuse = new Fuse(tasks, {
-    keys: ['text', 'notes', 'section', 'assigned_to', 'owner'],
-    threshold: 0.3
-  });
-  
-  searchResults = fuse.search(query).map(r => r.item);
-  isSearching = true;
-  render();
-}
-
-function switchTab(tab) {
+window.switchTab = (tab) => {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   event.target.closest('.tab').classList.add('active');
-  render();
-}
+  window.render();
+};
 
-function render() {
-  const filtered = getFilteredTasks();
-  const container = document.getElementById('main-content');
+window.doSearch = () => {
+  window.render();
+};
+
+window.render = () => {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  let filtered = tasks;
   
+  if (currentTab === 'todo') filtered = tasks.filter(t => !t.completed && !t.followup);
+  else if (currentTab === 'followup') filtered = tasks.filter(t => t.followup && !t.completed);
+  else if (currentTab === 'ryan') filtered = tasks.filter(t => t.assigned_to === 'Ryan' && !t.completed && !t.followup);
+  else if (currentTab === 'overdue') filtered = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) < new Date());
+  
+  if (q) filtered = filtered.filter(t => (t.text || '').toLowerCase().includes(q) || (t.notes || '').toLowerCase().includes(q));
+  
+  const container = document.getElementById('main-content');
   if (filtered.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>No tasks found</div>';
+    container.innerHTML = '<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">📭</div>No tasks</div>';
     return;
   }
   
@@ -375,74 +254,50 @@ function render() {
     const isDone = task.completed;
     const isOverdue = !isDone && task.due_date && new Date(task.due_date) < new Date();
     html += `
-      <div class="task-card ${isDone ? 'is-complete' : ''}" onclick="openEditModal(${task.id})">
+      <div class="task-card ${isDone ? 'is-complete' : ''}" onclick="window.openEditModal(${task.id})">
         <div class="task-main">
           <div class="task-check ${isDone ? 'done' : ''}">${isDone ? '✓' : ''}</div>
           <div class="task-body">
-            <div class="task-title" style="${isDone ? 'text-decoration:line-through;color:var(--text3);' : ''}">${escapeHtml(task.text || task.title)}</div>
+            <div class="task-title" style="${isDone ? 'text-decoration:line-through;color:var(--text3);' : ''}">${(task.text || task.title || '').substring(0, 80)}</div>
             <div class="task-meta">
               <span class="tag">${task.section || 'Admin'}</span>
               ${task.assigned_to ? `<span class="tag">→ ${task.assigned_to}</span>` : ''}
-              ${task.due_date ? `<span class="tag ${isOverdue ? 'tag-priority high' : ''}">${isOverdue ? '⚠️ ' : '📅 '}${task.due_date}</span>` : ''}
-              ${task.priority ? `<span class="tag tag-priority ${task.priority === 'high' || task.priority === 'critical' ? 'high' : ''}">${task.priority}</span>` : ''}
+              ${task.due_date ? `<span class="tag" style="color:${isOverdue ? 'var(--red)' : 'var(--text3)'};">${isOverdue ? '⚠️ ' : '📅 '}${task.due_date}</span>` : ''}
+              ${task.priority ? `<span class="tag">${task.priority}</span>` : ''}
               ${task.followup ? `<span class="tag" style="color:var(--purple);">🔔 Follow-Up</span>` : ''}
-              ${task.is_recurring ? `<span class="tag" style="color:var(--blue);">🔄 Recurring</span>` : ''}
             </div>
-            ${task.notes ? `<div style="font-size:12px;color:var(--text2);margin-top:4px;">${escapeHtml(task.notes.substring(0, 60))}...</div>` : ''}
           </div>
         </div>
       </div>
     `;
   });
-  
   container.innerHTML = html;
-}
+};
 
-function openNewTaskModal() {
+window.openNewTaskModal = () => {
   editingTaskId = null;
   document.getElementById('taskForm').reset();
-  document.getElementById('taskTitle').value = '';
-  document.getElementById('taskSection').value = 'Admin';
-  document.getElementById('taskStatus').value = 'incomplete';
-  document.getElementById('taskAssignedTo').value = '';
-  document.getElementById('taskOwner').value = currentUser;
-  document.getElementById('taskDueDate').value = '';
-  document.getElementById('taskPriority').value = 'medium';
-  document.getElementById('taskTags').value = '';
-  document.getElementById('taskNotes').value = '';
-  document.getElementById('taskCompletionNotes').value = '';
-  document.getElementById('taskFollowup').checked = false;
-  document.getElementById('taskRecurring').checked = false;
-  document.getElementById('recurringOptions').style.display = 'none';
   document.getElementById('editModal').classList.add('open');
-}
+};
 
-function openEditModal(taskId) {
+window.openEditModal = (taskId) => {
   editingTaskId = taskId;
   const task = tasks.find(t => t.id === taskId);
   if (!task) return;
-  
   document.getElementById('taskTitle').value = task.text || task.title || '';
   document.getElementById('taskSection').value = task.section || 'Admin';
   document.getElementById('taskStatus').value = task.completed ? 'complete' : 'incomplete';
   document.getElementById('taskAssignedTo').value = task.assigned_to || '';
-  document.getElementById('taskOwner').value = task.owner || currentUser;
+  document.getElementById('taskOwner').value = task.owner || '';
   document.getElementById('taskDueDate').value = task.due_date || '';
   document.getElementById('taskPriority').value = task.priority || 'medium';
-  document.getElementById('taskTags').value = Array.isArray(task.tags) ? task.tags.join(', ') : '';
   document.getElementById('taskNotes').value = task.notes || '';
-  document.getElementById('taskCompletionNotes').value = task.completion_notes || '';
   document.getElementById('taskFollowup').checked = task.followup || false;
-  document.getElementById('taskRecurring').checked = task.is_recurring || false;
-  document.getElementById('recurringOptions').style.display = task.is_recurring ? 'block' : 'none';
-  document.getElementById('taskRecurringType').value = task.recurring_type || 'weekly';
-  document.getElementById('taskRecurringInterval').value = task.recurring_interval || 1;
   document.getElementById('editModal').classList.add('open');
-}
+};
 
-async function saveTask(e) {
+window.saveTask = async (e) => {
   e.preventDefault();
-  
   const title = document.getElementById('taskTitle').value;
   if (!title) return alert('Title required');
   
@@ -455,157 +310,75 @@ async function saveTask(e) {
     owner: document.getElementById('taskOwner').value,
     due_date: document.getElementById('taskDueDate').value || null,
     priority: document.getElementById('taskPriority').value,
-    tags: document.getElementById('taskTags').value.split(',').map(t => t.trim()).filter(t => t),
     notes: document.getElementById('taskNotes').value,
-    completion_notes: document.getElementById('taskCompletionNotes').value,
     followup: document.getElementById('taskFollowup').checked,
-    is_recurring: document.getElementById('taskRecurring').checked,
-    recurring_type: document.getElementById('taskRecurringType').value,
-    recurring_interval: parseInt(document.getElementById('taskRecurringInterval').value),
     updated_at: new Date().toISOString()
   };
   
   if (!editingTaskId) {
-    const duplicates = findDuplicates(newTask);
-    if (duplicates.length > 0) {
-      showDuplicateCheck(duplicates, newTask);
-      return;
-    }
-    const { error } = await supabase.from('tasks').insert([newTask]).select();
-    if (error) { console.error(error); return; }
+    await db.from('tasks').insert([newTask]);
   } else {
-    const { error } = await supabase.from('tasks').update(newTask).eq('id', editingTaskId);
-    if (error) { console.error(error); return; }
+    await db.from('tasks').update(newTask).eq('id', editingTaskId);
   }
   
-  closeModal('editModal');
-  loadTasks();
-}
+  window.closeModal('editModal');
+  window.loadTasks();
+};
 
-function findDuplicates(task) {
-  return tasks.filter(t => 
-    t.text?.toLowerCase().includes(task.text.toLowerCase()) ||
-    (t.assigned_to === task.assigned_to && t.due_date === task.due_date)
-  ).slice(0, 5);
-}
+window.deleteTask = async () => {
+  if (!confirm('Delete?')) return;
+  await db.from('tasks').delete().eq('id', editingTaskId);
+  window.closeModal('editModal');
+  window.loadTasks();
+};
 
-function showDuplicateCheck(duplicates, newTask) {
-  const list = duplicates.map(d => `
-    <div style="padding:8px;background:var(--surface2);border-radius:4px;margin-bottom:8px;">
-      <div style="font-weight:500;">${escapeHtml(d.text || d.title)}</div>
-      <div style="font-size:11px;color:var(--text3);">Section: ${d.section} | Assigned: ${d.assigned_to || 'Unassigned'}</div>
-    </div>
-  `).join('');
-  document.getElementById('duplicateList').innerHTML = list;
-  document.getElementById('duplicateModal').classList.add('open');
-  window.pendingTask = newTask;
-}
-
-async function saveTaskAnyway() {
-  const { error } = await supabase.from('tasks').insert([window.pendingTask]).select();
-  if (error) { console.error(error); return; }
-  closeDuplicateCheck();
-  loadTasks();
-}
-
-function closeDuplicateCheck() {
-  document.getElementById('duplicateModal').classList.remove('open');
-  window.pendingTask = null;
-}
-
-async function deleteTask() {
-  if (!confirm('Delete this task?')) return;
-  const { error } = await supabase.from('tasks').delete().eq('id', editingTaskId);
-  if (error) { console.error(error); return; }
-  closeModal('editModal');
-  loadTasks();
-}
-
-function closeModal(id) {
+window.closeModal = (id) => {
   document.getElementById(id).classList.remove('open');
   editingTaskId = null;
-}
+};
 
-function exportCSV() {
-  const headers = ['ID', 'Title', 'Section', 'Status', 'Assigned To', 'Owner', 'Due Date', 'Priority', 'Notes', 'Created', 'Updated', 'Follow-Up'];
-  const rows = tasks.map(t => [
-    t.id,
-    t.text || t.title,
-    t.section,
-    t.completed ? 'Complete' : 'Incomplete',
-    t.assigned_to || '',
-    t.owner || '',
-    t.due_date || '',
-    t.priority || '',
-    t.notes || '',
-    t.created_at,
-    t.updated_at,
-    t.followup ? 'Yes' : 'No'
-  ]);
-  
+window.exportCSV = () => {
+  const headers = ['ID', 'Title', 'Section', 'Status', 'Assigned To', 'Due Date', 'Priority', 'Follow-Up'];
+  const rows = tasks.map(t => [t.id, t.text || t.title, t.section, t.completed ? 'Complete' : 'Incomplete', t.assigned_to || '', t.due_date || '', t.priority || '', t.followup ? 'Yes' : 'No']);
   let csv = headers.join(',') + '\n';
   rows.forEach(row => {
     csv += row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',') + '\n';
   });
-  
-  downloadFile(csv, 'tsar-tasks-backup.csv', 'text/csv');
-}
-
-function exportExcel() {
-  const ws_data = [['ID', 'Title', 'Section', 'Status', 'Assigned To', 'Owner', 'Due Date', 'Priority', 'Notes', 'Created', 'Updated']];
-  tasks.forEach(t => {
-    ws_data.push([
-      t.id,
-      t.text || t.title,
-      t.section,
-      t.completed ? 'Complete' : 'Incomplete',
-      t.assigned_to || '',
-      t.owner || '',
-      t.due_date || '',
-      t.priority || '',
-      t.notes || '',
-      t.created_at,
-      t.updated_at
-    ]);
-  });
-  
-  const ws = XLSX.utils.aoa_to_sheet(ws_data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Tasks');
-  XLSX.writeFile(wb, 'tsar-tasks-backup.xlsx');
-}
-
-function downloadFile(content, filename, type) {
-  const blob = new Blob([content], { type });
+  const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = filename;
+  a.download = 'tsar-backup.csv';
   a.click();
-  URL.revokeObjectURL(url);
-}
+};
 
-async function importFile(event) {
+window.exportExcel = () => {
+  const ws_data = [['ID', 'Title', 'Section', 'Status', 'Assigned To', 'Due Date', 'Priority']];
+  tasks.forEach(t => {
+    ws_data.push([t.id, t.text || t.title, t.section, t.completed ? 'Complete' : 'Incomplete', t.assigned_to || '', t.due_date || '', t.priority || '']);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Tasks');
+  XLSX.writeFile(wb, 'tsar-backup.xlsx');
+};
+
+window.importFile = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
-  
   const reader = new FileReader();
   reader.onload = async (e) => {
     try {
       let jsonData = [];
-      
       if (file.name.endsWith('.csv')) {
         const csv = e.target.result;
         const lines = csv.split('\n');
         const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
-        
         for (let i = 1; i < lines.length; i++) {
           if (!lines[i]) continue;
           const values = lines[i].match(/"[^"]*"|[^,]+/g).map(v => v.replace(/"/g, '').trim());
           const obj = {};
-          headers.forEach((h, idx) => {
-            obj[h] = values[idx];
-          });
+          headers.forEach((h, idx) => { obj[h] = values[idx]; });
           jsonData.push(obj);
         }
       } else {
@@ -613,46 +386,31 @@ async function importFile(event) {
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         jsonData = XLSX.utils.sheet_to_json(sheet);
       }
-      
-      if (!confirm(`Import ${jsonData.length} tasks? Existing tasks will not be overwritten.`)) return;
-      
+      if (!confirm(`Import ${jsonData.length} tasks?`)) return;
       for (const row of jsonData) {
         const newTask = {
-          text: row.Title || row.text || '',
-          section: row.Section || row.section || 'Admin',
-          assigned_to: row['Assigned To'] || row.assigned_to || null,
-          owner: row.Owner || row.owner || currentUser,
-          due_date: row['Due Date'] || row.due_date || null,
-          priority: row.Priority || row.priority || 'medium',
-          notes: row.Notes || row.notes || '',
-          followup: (row['Follow-Up'] || row.followup || '').toLowerCase() === 'yes',
-          completed: (row.Status || row.status || '').toLowerCase() === 'complete'
+          text: row.Title || '',
+          section: row.Section || 'Admin',
+          assigned_to: row['Assigned To'] || null,
+          due_date: row['Due Date'] || null,
+          priority: row.Priority || 'medium',
+          completed: (row.Status || '').toLowerCase() === 'complete',
+          followup: (row['Follow-Up'] || '').toLowerCase() === 'yes'
         };
-        
-        if (newTask.text) {
-          const { error } = await supabase.from('tasks').insert([newTask]);
-          if (error) console.error('Import error:', error);
-        }
+        if (newTask.text) await db.from('tasks').insert([newTask]);
       }
-      
       alert(`Imported ${jsonData.length} tasks!`);
       document.getElementById('importFile').value = '';
-      loadTasks();
+      window.loadTasks();
     } catch (err) {
       alert('Import error: ' + err.message);
     }
   };
-  
   reader.readAsArrayBuffer(file);
-}
+};
 
-function escapeHtml(text) {
-  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-  return String(text || '').replace(/[&<>"']/g, m => map[m]);
-}
-
-loadTasks();
-setInterval(loadTasks, 30000);
+window.loadTasks();
+setInterval(window.loadTasks, 30000);
 </script>
 </body>
 </html>
