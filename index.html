@@ -640,7 +640,7 @@ function getFilteredTasks(){
   else if(currentTab==='todo')filtered=tasks.filter(t=>t.status==='incomplete'&&!t.followup);
   else if(currentTab==='followup')filtered=tasks.filter(t=>t.followup&&t.status==='incomplete');
   else if(currentTab==='ryan')filtered=tasks.filter(t=>t.assignedTo==='Ryan'&&t.status==='incomplete'&&!t.followup);
-  if(q)filtered=filtered.filter(t=>t.title.toLowerCase().includes(q)||(t.notes&&t.notes.toLowerCase().includes(q)));
+  if(q)filtered=filtered.filter(t=>t.title.toLowerCase().includes(q)||(t.notes&&typeof t.notes==='string'&&t.notes.toLowerCase().includes(q)));
   return filtered;
 }
 
