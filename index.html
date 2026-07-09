@@ -267,7 +267,14 @@
         <option value="Admin">🗂️ Admin / IT / Vendors</option>
       </select>
     </div>
-    <div class="modal-field"><div class="modal-label">Notes</div><textarea class="form-input" id="new-notes" placeholder="Additional context…" style="height:72px"></textarea></div>
+    <div class="modal-field">
+      <div class="modal-label">Notes</div>
+      <textarea class="form-input" id="new-notes" placeholder="Additional context…" style="height:72px"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+        <button type="button" class="mic-btn" id="new-notes-mic" title="Speak the notes">🎙</button>
+      </div>
+      <div class="voice-note" id="new-notes-voice-note"></div>
+    </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('add-modal')">Cancel</button>
       <button class="btn btn-primary" id="add-btn" onclick="addTask()">Add Task</button>
@@ -305,7 +312,14 @@
   <div class="modal">
     <div class="modal-title">— Edit Notes</div>
     <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.4" id="edit-notes-title"></div>
-    <div class="modal-field"><div class="modal-label">Notes</div><textarea class="form-input" id="edit-notes-text" placeholder="Add notes, context, updates…" style="height:120px"></textarea></div>
+    <div class="modal-field">
+      <div class="modal-label">Notes</div>
+      <textarea class="form-input" id="edit-notes-text" placeholder="Add notes, context, updates…" style="height:120px"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+        <button type="button" class="mic-btn" id="edit-notes-text-mic" title="Speak the notes">🎙</button>
+      </div>
+      <div class="voice-note" id="edit-notes-text-voice-note"></div>
+    </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('notes-modal')">Cancel</button>
       <button class="btn btn-primary" id="save-notes-btn" onclick="saveNotes()">Save Notes</button>
@@ -318,7 +332,14 @@
   <div class="modal">
     <div class="modal-title" style="color:var(--green)">— Mark Complete</div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.4" id="complete-task-title"></div>
-    <div class="modal-field"><div class="modal-label">Completion Notes</div><textarea class="form-input" id="complete-notes" placeholder="What was done? Any notes?" style="height:88px"></textarea></div>
+    <div class="modal-field">
+      <div class="modal-label">Completion Notes</div>
+      <textarea class="form-input" id="complete-notes" placeholder="What was done? Any notes?" style="height:88px"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+        <button type="button" class="mic-btn" id="complete-notes-mic" title="Speak the notes">🎙</button>
+      </div>
+      <div class="voice-note" id="complete-notes-voice-note"></div>
+    </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('complete-modal')">Cancel</button>
       <button class="btn btn-complete" style="font-size:13px;padding:7px 14px;" id="confirm-btn" onclick="confirmComplete()">✓ Mark Complete</button>
@@ -468,6 +489,24 @@ setupVoice(
   document.getElementById('bulk-text'),
   document.getElementById('bulk-text-voice-note'),
   { continuous:true, append:true, onInput: updateBulkPreview }
+);
+setupVoice(
+  document.getElementById('new-notes-mic'),
+  document.getElementById('new-notes'),
+  document.getElementById('new-notes-voice-note'),
+  { continuous:true }
+);
+setupVoice(
+  document.getElementById('edit-notes-text-mic'),
+  document.getElementById('edit-notes-text'),
+  document.getElementById('edit-notes-text-voice-note'),
+  { continuous:true }
+);
+setupVoice(
+  document.getElementById('complete-notes-mic'),
+  document.getElementById('complete-notes'),
+  document.getElementById('complete-notes-voice-note'),
+  { continuous:true }
 );
 
 function showToast(msg,icon='✓'){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;document.getElementById('toast-icon').textContent=icon;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
