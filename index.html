@@ -160,6 +160,19 @@
   .loading{text-align:center;padding:60px 16px;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:12px;}
   .empty-state{text-align:center;padding:48px 0;color:var(--text3);font-size:13px;}
   .empty-icon{font-size:32px;margin-bottom:8px;}
+
+  /* VOICE INPUT */
+  .field-row{display:flex;gap:8px;align-items:stretch;}
+  .field-row .form-input{flex:1;}
+  .mic-btn{
+    flex:none;width:38px;border-radius:6px;border:1px solid var(--border);
+    background:var(--surface2);color:var(--text2);cursor:pointer;font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .mic-btn:hover{border-color:var(--border2);color:var(--text);}
+  .mic-btn.listening{background:var(--accent);border-color:var(--accent);color:#000;animation:micPulse 1.1s infinite;}
+  @keyframes micPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+  .voice-note{font-size:11px;color:var(--text3);margin-top:5px;min-height:1.2em;}
 </style>
 </head>
 <body>
@@ -237,7 +250,14 @@
 <div class="modal-overlay" id="add-modal">
   <div class="modal">
     <div class="modal-title">— New Task</div>
-    <div class="modal-field"><div class="modal-label">Task Title</div><input class="form-input" id="new-title" placeholder="Describe the task…"></div>
+    <div class="modal-field">
+      <div class="modal-label">Task Title</div>
+      <div class="field-row">
+        <input class="form-input" id="new-title" placeholder="Describe the task…">
+        <button type="button" class="mic-btn" id="new-title-mic" title="Speak the task">🎙</button>
+      </div>
+      <div class="voice-note" id="new-title-voice-note"></div>
+    </div>
     <div class="modal-field"><div class="modal-label">Section</div>
       <select class="form-input" id="new-section">
         <option value="Compliance">🔴 Compliance / Regulatory</option>
@@ -267,6 +287,10 @@
 * FCT LACTs — ensure all valves have locks
 * Update FCT signage at LACTs — add cameras
 * FCT flare conduit needs to be redone" style="height:260px" oninput="updateBulkPreview()"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+        <button type="button" class="mic-btn" id="bulk-text-mic" title="Speak items — say 'next' or pause between lines">🎙</button>
+      </div>
+      <div class="voice-note" id="bulk-text-voice-note"></div>
     </div>
     <div class="bulk-preview"><span id="bulk-count">0</span> tasks will be imported</div>
     <div class="modal-actions">
@@ -319,7 +343,14 @@
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
     <div class="modal-title">— Edit Task</div>
-    <div class="modal-field"><div class="modal-label">Task Title</div><input class="form-input" id="edit-title" placeholder="Describe the task…"></div>
+    <div class="modal-field">
+      <div class="modal-label">Task Title</div>
+      <div class="field-row">
+        <input class="form-input" id="edit-title" placeholder="Describe the task…">
+        <button type="button" class="mic-btn" id="edit-title-mic" title="Speak the task">🎙</button>
+      </div>
+      <div class="voice-note" id="edit-title-voice-note"></div>
+    </div>
     <div class="modal-field"><div class="modal-label">Section</div>
       <select class="form-input" id="edit-section">
         <option value="Compliance">🔴 Compliance / Regulatory</option>
@@ -362,6 +393,86 @@ async function sbPatch(table,id,data){const r=await fetch(`${SUPABASE_URL}/rest/
 
 let currentTab='master',currentUser='Rolando',expandedId=null,completingId=null,undoingId=null,editingNotesId=null,tasks=[];
 
+// ─── VOICE INPUT ──────────────────────────────────────────────
+const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+
+function setupVoice(micBtn, input, statusEl, opts){
+  opts = opts || {};
+  if(!micBtn || !input) return;
+  if(!SpeechRecognitionCtor){
+    micBtn.disabled = true;
+    micBtn.style.opacity = '0.4';
+    micBtn.title = 'Voice input not supported in this browser';
+    return;
+  }
+  let recognition = null;
+  let listening = false;
+
+  micBtn.addEventListener('click', ()=>{
+    if(listening){ recognition && recognition.stop(); return; }
+    recognition = new SpeechRecognitionCtor();
+    recognition.lang = 'en-US';
+    recognition.interimResults = true;
+    recognition.continuous = !!opts.continuous;
+
+    recognition.onstart = ()=>{
+      listening = true;
+      micBtn.classList.add('listening');
+      if(statusEl) statusEl.textContent = 'Listening…';
+    };
+    recognition.onresult = (e)=>{
+      let transcript = '';
+      for(let i=0;i<e.results.length;i++){ transcript += e.results[i][0].transcript; }
+      if(opts.append){
+        const existing = input.value.replace(/\s+$/,'');
+        input.value = (existing ? existing + '\n' : '') + transcript;
+      }else{
+        input.value = transcript;
+      }
+      if(opts.onInput) opts.onInput();
+    };
+    recognition.onerror = (e)=>{
+      if(statusEl){
+        if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){
+          statusEl.textContent = 'Microphone access was blocked — check browser permissions.';
+        }else if(e.error === 'no-speech'){
+          statusEl.textContent = "Didn't catch that — try again.";
+        }else{
+          statusEl.textContent = 'Voice input error: ' + e.error;
+        }
+      }
+    };
+    recognition.onend = ()=>{
+      listening = false;
+      micBtn.classList.remove('listening');
+      if(statusEl && statusEl.textContent === 'Listening…') statusEl.textContent = '';
+      input.focus();
+    };
+    try{ recognition.start(); }
+    catch(err){ if(statusEl) statusEl.textContent = 'Could not start microphone.'; }
+  });
+}
+
+setupVoice(
+  document.getElementById('new-title-mic'),
+  document.getElementById('new-title'),
+  document.getElementById('new-title-voice-note')
+);
+setupVoice(
+  document.getElementById('edit-title-mic'),
+  document.getElementById('edit-title'),
+  document.getElementById('edit-title-voice-note')
+);
+setupVoice(
+  document.getElementById('bulk-text-mic'),
+  document.getElementById('bulk-text'),
+  document.getElementById('bulk-text-voice-note'),
+  { continuous:true, append:true, onInput: updateBulkPreview }
+);
+
+function showToast(msg,icon='✓'){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;document.getElementById('toast-icon').textContent=icon;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
 async function loadTasks(){
   try{
     const data=await sbGet('tasks?select=*&order=created_at.asc');
@@ -377,9 +488,6 @@ async function loadTasks(){
     document.getElementById('main-content').innerHTML=`<div class="empty-state"><div class="empty-icon">⚠️</div><div style="color:var(--red);margin-bottom:8px">Could not load tasks</div><div style="font-size:11px;color:var(--text3)">${e.message}</div><button class="btn" style="margin-top:12px" onclick="loadTasks()">Retry</button></div>`;
   }
 }
-
-function showToast(msg,icon='✓'){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;document.getElementById('toast-icon').textContent=icon;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
 
 function openAddModal(){
   document.getElementById('add-modal').classList.add('open');
@@ -452,7 +560,6 @@ function switchTab(tab){
   currentTab=tab;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
-  // Update sidebar active state
   ['master','todo','followup','ryan'].forEach(t=>{
     const el=document.getElementById('sb-'+t);
     if(el)el.classList.toggle('active',t===tab);
@@ -611,7 +718,6 @@ function updateStats(){
   document.getElementById('badge-todo').textContent=todo;
   document.getElementById('badge-followup').textContent=followup;
   document.getElementById('badge-ryan').textContent=ryan;
-  // Sidebar numbers
   const sbTotal=document.getElementById('sb-total');const sbTodo=document.getElementById('sb-todo-n');
   const sbFU=document.getElementById('sb-followup-n');const sbRyan=document.getElementById('sb-ryan-n');
   if(sbTotal)sbTotal.textContent=total;if(sbTodo)sbTodo.textContent=todo;
