@@ -9,7 +9,7 @@
   :root {
     --bg:#0d0f12;--surface:#13161a;--surface2:#1a1e24;--border:#252a32;--border2:#2e343e;
     --text:#e8eaf0;--text2:#8b92a0;--text3:#555d6b;--accent:#e8a020;--accent2:#c47c0a;
-    --green:#2ecc71;--red:#e74c3c;--blue:#3498db;--purple:#9b59b6;--orange:#e67e22;
+    --green:#2ecc71;--red:#e74c3c;--blue:#3498db;--purple:#9b59b6;--orange:#e67e22;--teal:#1abc9c;--pink:#ec4899;--yellow:#f1c40f;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
@@ -111,6 +111,9 @@
   .section-operations .task-card{border-left:2px solid var(--blue);}
   .section-admin .task-card{border-left:2px solid var(--purple);}
   .section-inspections .task-card{border-left:2px solid var(--green);}
+  .section-requisition .task-card{border-left:2px solid var(--teal);}
+  .section-moc .task-card{border-left:2px solid var(--pink);}
+  .section-engineering .task-card{border-left:2px solid var(--yellow);}
   .task-main{padding:12px 14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;}
   .task-check{width:16px;height:16px;border:1px solid var(--border2);border-radius:3px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:9px;}
   .task-check.done{background:var(--green);border-color:var(--green);color:#000;}
@@ -123,6 +126,10 @@
   .tag-followup{background:rgba(155,89,182,.15);border:1px solid rgba(155,89,182,.3);color:var(--purple);}
   .tag-ryan{background:rgba(52,152,219,.12);border:1px solid rgba(52,152,219,.25);color:var(--blue);}
   .tag-completedby{background:rgba(46,204,113,.15);border:1px solid rgba(46,204,113,.3);color:var(--green);font-weight:600;}
+  .tag-pinned{background:rgba(241,196,15,.15);border:1px solid rgba(241,196,15,.3);color:var(--yellow);}
+  .today-summary{background:linear-gradient(135deg,rgba(241,196,15,.1),rgba(241,196,15,.03));border:1px solid rgba(241,196,15,.25);border-radius:8px;padding:16px 18px;margin-bottom:16px;}
+  .today-summary-rate{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;color:var(--yellow);}
+  .today-summary-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
   .task-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
   .task-expanded{border-top:1px solid var(--border);padding:14px;background:var(--surface2);display:none;}
   .task-expanded.open{display:block;}
@@ -189,6 +196,7 @@
 
 <!-- TABS -->
 <div class="tabs">
+  <div class="tab" onclick="switchTab('today')" id="tab-today">📌 Today <span class="tab-badge" id="badge-today">0</span></div>
   <div class="tab active" onclick="switchTab('master')" id="tab-master">Master <span class="tab-badge" id="badge-master">0</span></div>
   <div class="tab" onclick="switchTab('todo')" id="tab-todo">To-Do <span class="tab-badge" id="badge-todo">0</span></div>
   <div class="tab" onclick="switchTab('followup')" id="tab-followup">Follow-Up <span class="tab-badge" id="badge-followup">0</span></div>
@@ -265,6 +273,9 @@
         <option value="Operations">⚙️ Operations / Process</option>
         <option value="Inspections">🔬 Inspections / Integrity</option>
         <option value="Admin">🗂️ Admin / IT / Vendors</option>
+        <option value="Requisition">📦 Requisition Queue</option>
+        <option value="MOC">🔄 MOC / Management of Change</option>
+        <option value="Engineering">📐 Engineering</option>
       </select>
     </div>
     <div class="modal-field">
@@ -379,6 +390,9 @@
         <option value="Operations">⚙️ Operations / Process</option>
         <option value="Inspections">🔬 Inspections / Integrity</option>
         <option value="Admin">🗂️ Admin / IT / Vendors</option>
+        <option value="Requisition">📦 Requisition Queue</option>
+        <option value="MOC">🔄 MOC / Management of Change</option>
+        <option value="Engineering">📐 Engineering</option>
       </select>
     </div>
     <div class="modal-actions">
@@ -520,7 +534,8 @@ async function loadTasks(){
       status:r.completed?'complete':'incomplete',followup:r.followup||false,
       notes:r.notes||'',
       date:r.date_added?new Date(r.date_added).toLocaleDateString('en-US'):new Date(r.created_at).toLocaleDateString('en-US'),
-      assignedTo:r.assigned_to||null,completedBy:r.completed_by||null,completedNotes:r.completion_notes||''
+      assignedTo:r.assigned_to||null,completedBy:r.completed_by||null,completedNotes:r.completion_notes||'',
+      todayDate:r.today_date||null
     }));
     updateStats();renderTasks();updateSidebar();
   }catch(e){
@@ -599,7 +614,7 @@ function switchTab(tab){
   currentTab=tab;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
-  ['master','todo','followup','ryan'].forEach(t=>{
+  ['today','master','todo','followup','ryan'].forEach(t=>{
     const el=document.getElementById('sb-'+t);
     if(el)el.classList.toggle('active',t===tab);
   });
@@ -619,6 +634,31 @@ async function pushToRyan(id){
     const task=tasks.find(t=>t.id===id);if(task)task.assignedTo='Ryan';
     updateStats();renderTasks();updateSidebar();
     showToast('Pushed to Ryan — stays on To-Do too','📤');
+  }catch(e){showToast('Error: '+e.message,'⚠️');}
+}
+
+function localDateStr(offsetDays){
+  const d=new Date();
+  d.setDate(d.getDate()+offsetDays);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+async function pinToDay(id,which){
+  const dateStr = which==='tomorrow' ? localDateStr(1) : localDateStr(0);
+  try{
+    await sbPatch('tasks',id,{today_date:dateStr});
+    const task=tasks.find(t=>t.id===id);if(task)task.todayDate=dateStr;
+    updateStats();renderTasks();updateSidebar();
+    showToast(which==='tomorrow'?'Pinned for tomorrow':'Pinned for today','📌');
+  }catch(e){showToast('Error: '+e.message,'⚠️');}
+}
+
+async function unpinFromDay(id){
+  try{
+    await sbPatch('tasks',id,{today_date:null});
+    const task=tasks.find(t=>t.id===id);if(task)task.todayDate=null;
+    updateStats();renderTasks();updateSidebar();
+    showToast('Unpinned','↩️');
   }catch(e){showToast('Error: '+e.message,'⚠️');}
 }
 
@@ -757,6 +797,9 @@ function updateStats(){
   document.getElementById('badge-todo').textContent=todo;
   document.getElementById('badge-followup').textContent=followup;
   document.getElementById('badge-ryan').textContent=ryan;
+  const todayStr=localDateStr(0);
+  const todayCount=tasks.filter(t=>t.todayDate===todayStr&&t.status==='incomplete').length;
+  document.getElementById('badge-today').textContent=todayCount;
   const sbTotal=document.getElementById('sb-total');const sbTodo=document.getElementById('sb-todo-n');
   const sbFU=document.getElementById('sb-followup-n');const sbRyan=document.getElementById('sb-ryan-n');
   if(sbTotal)sbTotal.textContent=total;if(sbTodo)sbTodo.textContent=todo;
@@ -769,7 +812,7 @@ function updateSidebar(){
     if(!sections[t.section])sections[t.section]={icon:'•',count:0};
     sections[t.section].count++;
   });
-  const icons={Compliance:'🔴',Maintenance:'🔧',Operations:'⚙️',Inspections:'🔬',Admin:'🗂️'};
+  const icons={Compliance:'🔴',Maintenance:'🔧',Operations:'⚙️',Inspections:'🔬',Admin:'🗂️',Requisition:'📦',MOC:'🔄',Engineering:'📐'};
   const el=document.getElementById('sidebar-sections');
   if(!el)return;
   el.innerHTML=Object.entries(sections).map(([s,d])=>
@@ -782,6 +825,7 @@ function getFilteredTasks(){
   const q=(document.getElementById('search-input').value||'').toLowerCase();
   let filtered;
   if(currentTab==='master')filtered=[...tasks];
+  else if(currentTab==='today')filtered=tasks.filter(t=>t.todayDate===localDateStr(0));
   else if(currentTab==='todo')filtered=tasks.filter(t=>t.status==='incomplete'&&!t.followup);
   else if(currentTab==='followup')filtered=tasks.filter(t=>t.followup&&t.status==='incomplete');
   else if(currentTab==='ryan')filtered=tasks.filter(t=>t.assignedTo==='Ryan'&&t.status==='incomplete'&&!t.followup);
@@ -789,11 +833,12 @@ function getFilteredTasks(){
   return filtered;
 }
 
-const sectionMeta={Compliance:{icon:'🔴',cls:'section-compliance'},Maintenance:{icon:'🔧',cls:'section-maintenance'},Operations:{icon:'⚙️',cls:'section-operations'},Inspections:{icon:'🔬',cls:'section-inspections'},Admin:{icon:'🗂️',cls:'section-admin'}};
+const sectionMeta={Compliance:{icon:'🔴',cls:'section-compliance'},Maintenance:{icon:'🔧',cls:'section-maintenance'},Operations:{icon:'⚙️',cls:'section-operations'},Inspections:{icon:'🔬',cls:'section-inspections'},Admin:{icon:'🗂️',cls:'section-admin'},Requisition:{icon:'📦',cls:'section-requisition'},MOC:{icon:'🔄',cls:'section-moc'},Engineering:{icon:'📐',cls:'section-engineering'}};
 
 function renderTasks(){
   const filtered=getFilteredTasks();const container=document.getElementById('main-content');
   if(currentTab==='ryan'){renderRyanTab(filtered,container);return;}
+  if(currentTab==='today'){renderTodayTab(filtered,container);return;}
   if(filtered.length===0){container.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div>No tasks</div>`;return;}
   const groups={};filtered.forEach(t=>{if(!groups[t.section])groups[t.section]=[];groups[t.section].push(t);});
   let html='';
@@ -812,8 +857,26 @@ function renderRyanTab(filtered,container){
   container.innerHTML=html;
 }
 
-function renderCard(t,isRyanView=false){
+function renderTodayTab(filtered,container){
+  const done=filtered.filter(t=>t.status==='complete').length;
+  const total=filtered.length;
+  const rate=total>0?Math.round((done/total)*100):0;
+  let html=`<div class="today-summary">
+    <div class="today-summary-rate">${done} of ${total} done${total>0?` (${rate}%)`:''}</div>
+    <div class="today-summary-label">Today's punch list</div>
+  </div>`;
+  if(filtered.length===0){
+    html+=`<div class="empty-state"><div class="empty-icon">📌</div>Nothing pinned for today yet.<br><span style="font-size:11px">Open a task in Master or To-Do and tap 📌 Today.</span></div>`;
+  }else{
+    filtered.forEach(t=>{html+=renderCard(t,false,true);});
+  }
+  container.innerHTML=html;
+}
+
+function renderCard(t,isRyanView=false,isTodayView=false){
   const isDone=t.status==='complete';const isExpanded=expandedId===t.id;const alreadyPushed=t.assignedTo==='Ryan';
+  const todayStr=localDateStr(0);const tomorrowStr=localDateStr(1);
+  const pinLabel = t.todayDate===todayStr ? 'Today' : (t.todayDate===tomorrowStr ? 'Tomorrow' : (t.todayDate||null));
 
   let topAction='';
   if(!isDone&&!t.followup&&(currentTab==='todo'||currentTab==='master')&&!alreadyPushed)
@@ -835,6 +898,7 @@ function renderCard(t,isRyanView=false){
             ${t.followup?'<span class="tag tag-followup">🔔 Follow-Up</span>':''}
             ${alreadyPushed&&!t.followup?'<span class="tag tag-ryan">→ Ryan</span>':''}
             ${isDone?`<span class="tag tag-completedby">✓ ${t.completedBy}</span>`:''}
+            ${pinLabel&&!isTodayView?`<span class="tag tag-pinned">📌 ${pinLabel}</span>`:''}
           </div>
         </div>
         <div class="task-actions">${topAction}</div>
@@ -852,6 +916,9 @@ function renderCard(t,isRyanView=false){
           <button class="btn" style="font-size:11px;padding:4px 8px" onclick="openNotesModal(${t.id})">📝 Edit Notes</button>
           ${!isDone?`<button class="btn btn-followup ${t.followup?'flagged':''}" style="font-size:11px;padding:4px 8px" onclick="toggleFollowup(${t.id})">${t.followup?'🔔 Remove Follow-Up':'🔔 Flag Follow-Up'}</button>`:''}
           ${!isDone&&!alreadyPushed&&!t.followup&&(currentTab==='todo'||currentTab==='master')?`<button class="btn btn-ryan" style="font-size:11px;padding:4px 8px" onclick="pushToRyan(${t.id})">📤 Push to Ryan</button>`:''}
+          ${!isDone&&t.todayDate!==todayStr?`<button class="btn" style="font-size:11px;padding:4px 8px;background:rgba(241,196,15,.12);color:var(--yellow);border-color:rgba(241,196,15,.3);" onclick="pinToDay(${t.id},'today')">📌 Today</button>`:''}
+          ${!isDone&&t.todayDate!==tomorrowStr?`<button class="btn" style="font-size:11px;padding:4px 8px;background:rgba(241,196,15,.12);color:var(--yellow);border-color:rgba(241,196,15,.3);" onclick="pinToDay(${t.id},'tomorrow')">📌 Tomorrow</button>`:''}
+          ${t.todayDate?`<button class="btn" style="font-size:11px;padding:4px 8px" onclick="unpinFromDay(${t.id})">✕ Unpin</button>`:''}
           ${!isDone&&currentTab!=='master'?`<button class="btn btn-complete" style="font-size:12px;padding:6px 12px" onclick="openCompleteModal(${t.id})">✓ Mark Complete</button>`:''}
           ${isDone&&currentTab==='master'?`<button class="btn" style="font-size:12px;padding:6px 12px;background:rgba(231,76,60,.15);color:var(--red);border-color:rgba(231,76,60,.3);" onclick="openUndoModal(${t.id})">↩ Back to To-Do</button>`:''}
           <button class="btn" style="font-size:11px;padding:4px 8px;background:rgba(231,76,60,.1);color:var(--red);border-color:rgba(231,76,60,.3);margin-left:auto" onclick="openDeleteModal(${t.id})">🗑️ Delete</button>
