@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TSAR Tracker + AI</title>
+  <style>
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0f14;font-family:Arial,sans-serif}
+    #tracker{border:0;width:100%;height:100%;display:block;background:white}
+    #aiButton{position:fixed;right:24px;bottom:24px;z-index:10;border:0;border-radius:999px;padding:15px 22px;background:#f4b400;color:#111;font-size:16px;font-weight:700;box-shadow:0 8px 28px rgba(0,0,0,.28);cursor:pointer}
+    #panel{position:fixed;inset:0 0 0 auto;width:min(760px,96vw);height:100%;z-index:20;background:#0b0f14;box-shadow:-10px 0 35px rgba(0,0,0,.4);transform:translateX(105%);transition:transform .2s ease}
+    #panel.open{transform:translateX(0)}
+    #panel iframe{border:0;width:100%;height:100%}
+    #close{position:absolute;right:18px;top:16px;z-index:21;border:1px solid #444;background:#151a21;color:white;border-radius:8px;padding:8px 12px;cursor:pointer}
+    @media(max-width:700px){#aiButton{right:14px;bottom:14px}#panel{width:100vw}}
+  </style>
+</head>
+<body>
+  <iframe id="tracker" src="./index.html" title="TSAR Tracker"></iframe>
+  <button id="aiButton" type="button">Create Task with AI</button>
+  <aside id="panel" aria-hidden="true">
+    <button id="close" type="button">Close</button>
+    <iframe src="./ai-assistant.html" title="TSAR AI Task Assistant"></iframe>
+  </aside>
+  <script>
+    const panel=document.getElementById('panel');
+    const openBtn=document.getElementById('aiButton');
+    const closeBtn=document.getElementById('close');
+    function openAI(){panel.classList.add('open');panel.setAttribute('aria-hidden','false')}
+    function closeAI(){panel.classList.remove('open');panel.setAttribute('aria-hidden','true');document.getElementById('tracker').contentWindow?.location.reload()}
+    openBtn.addEventListener('click',openAI);
+    closeBtn.addEventListener('click',closeAI);
+    window.addEventListener('keydown',e=>{if(e.key==='Escape')closeAI()});
+  </script>
+</body>
+</html>
