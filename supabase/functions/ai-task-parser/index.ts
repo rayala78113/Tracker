@@ -24,13 +24,8 @@ const allowedSections = [
 ] as const;
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
-
-  if (req.method !== "POST") {
-    return json({ error: "Method not allowed" }, 405);
-  }
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
   try {
     const apiKey = Deno.env.get("OPENAI_API_KEY");
@@ -42,24 +37,12 @@ Deno.serve(async (req) => {
     if (notes.length > 12000) return json({ error: "notes is too long" }, 400);
 
     const model = Deno.env.get("OPENAI_MODEL") || "gpt-5-mini";
-
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model,
-        instructions: [
-          "You convert rough operations notes into a proposed TSAR Tracker task.",
-          "Preserve facts from the user's notes. Do not invent names, dates, vendors, equipment, costs, regulatory requirements, or completion status.",
-          "Choose exactly one Tracker section from the allowed enum.",
-          "Keep the title concise and action-oriented.",
-          "Put supporting context in notes.",
-          "If the notes do not clearly identify an assignee, return an empty assigned_to string.",
-          "This is a draft for human approval, not an instruction to perform work."
-        ].join(" "),
+        instructions: "Convert the user's rough note into a proposed TSAR Tracker task. Correct spelling, grammar, and obvious transcription errors while preserving the user's intended meaning. Do not add work, recommendations, inspections, verification steps, documentation requirements, dates, deadlines, people, vendors, equipment, costs, regulatory requirements, technical claims, completion status, or other facts that are not explicitly stated or unambiguously implied by the user's note. Do not turn a simple task into a broader scope of work. The notes field should be a concise cleaned-up version of what the user actually said; do not prepend 'Original note' and do not quote the raw input. Choose exactly one Tracker section from the allowed enum based only on the note. Keep the title concise and action-oriented. If no assignee is clearly stated, return an empty assigned_to string. Set followup true only when the user's note explicitly indicates a follow-up, pending item, waiting condition, or future check; otherwise false. The output is a draft for human approval and must not perform work.",
         input: notes,
         text: {
           format: {
@@ -94,11 +77,8 @@ Deno.serve(async (req) => {
     if (!outputText) return json({ error: "AI returned no task draft" }, 502);
 
     let draft;
-    try {
-      draft = JSON.parse(outputText);
-    } catch {
-      return json({ error: "AI returned invalid structured output" }, 502);
-    }
+    try { draft = JSON.parse(outputText); }
+    catch { return json({ error: "AI returned invalid structured output" }, 502); }
 
     return json({ draft }, 200);
   } catch (error) {
@@ -111,9 +91,7 @@ function extractOutputText(payload: any): string {
   if (typeof payload?.output_text === "string") return payload.output_text;
   for (const item of payload?.output || []) {
     for (const content of item?.content || []) {
-      if (content?.type === "output_text" && typeof content?.text === "string") {
-        return content.text;
-      }
+      if (content?.type === "output_text" && typeof content?.text === "string") return content.text;
     }
   }
   return "";
