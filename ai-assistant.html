@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSAR AI Task Assistant</title>
+<style>
+  body{font-family:Arial,sans-serif;background:#0d0f12;color:#e8eaf0;margin:0;padding:24px}
+  .wrap{max-width:900px;margin:0 auto}
+  .card{background:#13161a;border:1px solid #2e343e;border-radius:10px;padding:20px;margin-bottom:16px}
+  textarea,input,select{width:100%;box-sizing:border-box;background:#1a1e24;border:1px solid #2e343e;color:#e8eaf0;border-radius:6px;padding:10px;margin-top:6px}
+  textarea{min-height:150px;resize:vertical}
+  label{display:block;font-size:12px;color:#8b92a0;margin-top:12px}
+  button{border:0;border-radius:6px;padding:10px 14px;cursor:pointer;margin-right:8px}
+  .primary{background:#e8a020;color:#000;font-weight:700}
+  .secondary{background:#252a32;color:#e8eaf0}
+  .success{background:#2ecc71;color:#000;font-weight:700}
+  .muted{color:#8b92a0;font-size:13px}
+  .error{color:#e74c3c;white-space:pre-wrap}
+  .ok{color:#2ecc71}
+  .hidden{display:none}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:700px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>TSAR AI Task Assistant</h1>
+  <p class="muted">Development page. AI only proposes a task. Nothing is saved until you approve it.</p>
+
+  <div class="card">
+    <label>Rough notes</label>
+    <textarea id="notes" placeholder="Example: USA DeBusk needs to replace Block Valve 3 on the TSAR pipeline. We will provide the forklift and vacuum truck. The replacement valve is at Brooks and already painted."></textarea>
+    <div style="margin-top:14px">
+      <button id="generate" class="primary">Create Draft with AI</button>
+      <button id="clear" class="secondary">Clear</button>
+    </div>
+    <div id="status" class="muted" style="margin-top:12px"></div>
+    <div id="error" class="error"></div>
+  </div>
+
+  <div id="preview" class="card hidden">
+    <h2>AI Draft</h2>
+    <div class="grid">
+      <div>
+        <label>Title</label>
+        <input id="title">
+      </div>
+      <div>
+        <label>Section</label>
+        <select id="section">
+          <option>Compliance</option><option>Maintenance</option><option>Operations</option><option>Inspections</option><option>Admin</option><option>Requisition</option><option>MOC</option><option>Engineering</option>
+        </select>
+      </div>
+      <div>
+        <label>Assigned to</label>
+        <input id="assigned_to" placeholder="Leave blank if unassigned">
+      </div>
+      <div>
+        <label>Follow-up</label>
+        <select id="followup"><option value="false">No</option><option value="true">Yes</option></select>
+      </div>
+    </div>
+    <label>Notes</label>
+    <textarea id="draft_notes"></textarea>
+    <label>AI rationale</label>
+    <textarea id="rationale" readonly style="min-height:90px;color:#8b92a0"></textarea>
+    <div style="margin-top:14px">
+      <button id="save" class="success">Approve & Save Task</button>
+    </div>
+    <div id="saveStatus" class="muted" style="margin-top:12px"></div>
+  </div>
+</div>
+<script>
+const SUPABASE_URL='https://jbnufforfpgawnawgujv.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpibnVmZm9yZnBnYXduYXdndWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNzk4ODEsImV4cCI6MjA5MTg1NTg4MX0.Zy4dcmb99FsMUDKMxn2ASsQ2ZmGO0aeCumO21jD8EBY';
+const headers={'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY};
+let currentDraft=null;
+
+const $=id=>document.getElementById(id);
+$('generate').addEventListener('click',generateDraft);
+$('clear').addEventListener('click',()=>{ $('notes').value=''; $('preview').classList.add('hidden'); $('status').textContent=''; $('error').textContent=''; currentDraft=null; });
+$('save').addEventListener('click',saveTask);
+
+async function generateDraft(){
+  const notes=$('notes').value.trim();
+  if(!notes){$('error').textContent='Enter rough notes first.';return;}
+  $('generate').disabled=true;$('status').textContent='Generating task draft…';$('error').textContent='';
+  try{
+    const r=await fetch(`${SUPABASE_URL}/functions/v1/ai-task-parser`,{method:'POST',headers,body:JSON.stringify({notes})});
+    const data=await r.json();
+    if(!r.ok)throw new Error(data?.error||`Request failed (${r.status})`);
+    currentDraft=data.draft;
+    $('title').value=currentDraft.title||'';
+    $('section').value=currentDraft.section||'Admin';
+    $('assigned_to').value=currentDraft.assigned_to||'';
+    $('followup').value=String(!!currentDraft.followup);
+    $('draft_notes').value=currentDraft.notes||'';
+    $('rationale').value=currentDraft.rationale||'';
+    $('preview').classList.remove('hidden');
+    $('status').textContent='Draft ready. Review and edit before saving.';
+  }catch(e){$('error').textContent=e.message;$('status').textContent='';}
+  finally{$('generate').disabled=false;}
+}
+
+async function saveTask(){
+  const title=$('title').value.trim();
+  if(!title){$('saveStatus').textContent='Title is required.';return;}
+  $('save').disabled=true;$('saveStatus').textContent='Saving…';
+  const task={
+    text:title,
+    section:$('section').value,
+    completed:false,
+    followup:$('followup').value==='true',
+    notes:$('draft_notes').value,
+    date_added:new Date().toISOString(),
+    assigned_to:$('assigned_to').value.trim()||null,
+    completed_by:null,
+    completion_notes:'',
+    attachments:[]
+  };
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/tasks`,{method:'POST',headers:{...headers,'Prefer':'return=representation'},body:JSON.stringify(task)});
+    const data=await r.json();
+    if(!r.ok)throw new Error(JSON.stringify(data));
+    $('saveStatus').innerHTML='<span class="ok">Task saved successfully.</span>';
+  }catch(e){$('saveStatus').textContent='Save failed: '+e.message;}
+  finally{$('save').disabled=false;}
+}
+</script>
+</body>
+</html>
