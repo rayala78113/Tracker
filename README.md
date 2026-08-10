@@ -4,56 +4,75 @@ TSAR Task Tracker is a lightweight operations task-management application deploy
 
 ## Environments
 
-- `main`: production branch. Changes should reach this branch only through a reviewed pull request.
+- `main`: production branch. Changes should reach this branch only after development testing.
 - `ai-development`: development and testing branch for security, architecture, and AI work.
 
-## Current architecture
+## Target architecture
 
 ```text
-Browser
-  |
-  | HTTPS REST requests
-  v
-Supabase PostgREST API
-  |
-  v
-public.tasks
-
-GitHub main branch
-  |
-  v
-AWS Amplify production deployment
+ChatGPT / Tracker UI / Slack
+            |
+            v
+     Tracker command layer
+            |
+     targeted task search
+            |
+            v
+        Supabase
+            |
+   tasks + task history
 ```
 
-The current application is implemented in a single `index.html` file containing HTML, CSS, JavaScript, voice-entry logic, and direct Supabase REST calls.
+Supabase remains the source of truth. The Tracker website is the visual operations interface; AI interfaces are alternate ways to query and direct the same underlying work.
+
+## AI command layer
+
+`supabase/functions/tracker-command/index.ts` is the unified AI entry point for normal Tracker operations. It supports:
+
+- questions and workload analysis
+- planning and prioritization
+- new-task proposals
+- task updates
+- note appends
+- assignment changes
+- follow-up/status/priority/due-date changes
+- completion requests
+
+Writes remain preview-and-confirm. The command layer searches/filter tasks before sending records to the model instead of loading the entire Tracker for routine requests.
+
+`public.search_tracker_tasks(...)` provides targeted database retrieval by text, assignee, section, completion state, follow-up state, priority, and due-date range.
+
+## Development UI
+
+`tracker-ai.html` wraps the existing Tracker and opens `ai-command-center.html` in a side panel. The panel uses one natural-language input for questions, planning, creation, and updates.
+
+The earlier `ai-assistant.html` and `ai-tracker-chat.html` pages are retained only as development prototypes and should not be treated as the long-term architecture.
 
 ## Current database
 
-The connected Supabase project is `jbnufforfpgawnawgujv` and currently contains these application tables:
+The connected Supabase project is `jbnufforfpgawnawgujv` and contains these application tables:
 
 - `tasks`
 - `task_history`
 - `task_attachments`
 - `recurring_tasks`
 
-At the start of the architecture review, `tasks` contained 217 records. The other three application tables contained no records.
+Slack support also uses `slack_tracker_pending_actions` for short-lived confirmation requests.
 
 ## Development rules
 
 1. Do not develop directly on `main`.
-2. Do not place OpenAI, Slack, Supabase service-role, or other private keys in browser code or GitHub.
-3. Test all database-policy changes before merging them to production.
-4. Keep AI-generated task changes in preview/approval mode until audit history and authorization are operational.
-5. Use pull requests to merge `ai-development` changes into `main`.
+2. Do not place OpenAI, Slack signing secrets, Slack bot tokens, Supabase service-role keys, or other private credentials in browser code or GitHub.
+3. Keep Supabase as the system of record.
+4. Retrieve the smallest useful task set before AI reasoning.
+5. Do not let AI invent work, status, assignees, dates, or completion.
+6. Require confirmation for browser/Slack writes and stop on ambiguous task matches.
+7. Preserve audit history for task changes.
+8. Resolve authentication/RLS before treating the browser as production-secure.
 
-## Planned delivery order
+## Remaining production work
 
-1. Document and stabilize the existing application.
-2. Add authentication and row-level security without interrupting current task access.
-3. Activate task audit history.
-4. Add a secured Supabase Edge Function for AI task parsing.
-5. Add a `Create Task with AI` preview-and-approve workflow.
-6. Add controlled AI queries and task updates.
-7. Add Slack event ingestion after authorization and audit controls are proven.
-
-See `docs/ARCHITECTURE.md`, `docs/SECURITY-PLAN.md`, and `docs/ROADMAP.md` for the implementation plan.
+1. Test the unified command layer against real questions, create requests, updates, and completion commands.
+2. Replace/retire prototype AI paths after validation.
+3. Add user authentication and restrictive row-level security; the current public application tables still require this hardening.
+4. Review the `ai-development` diff and merge the production-ready pieces into `main`.
